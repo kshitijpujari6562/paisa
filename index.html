@@ -603,16 +603,28 @@ function render() {
   const totalExpDr = transactions.filter(t=>t.type==='dr'&&!isCredPay(t.category)).reduce((s,t)=>s+t.amount,0);
   document.getElementById('dailyAvg').textContent = fmt(totalExpDr/days);
 
-  // CC card balances: spend - cred payments
+  // CC card balances: only spends AFTER the last CRED payment count as outstanding
   const ccRowHTML = CC_CARDS.map(card => {
-    const spend = transactions.filter(t=>t.category===card.spendCat&&t.type==='dr').reduce((s,t)=>s+t.amount,0);
-    const paid  = transactions.filter(t=>t.category===card.credCat&&t.type==='dr').reduce((s,t)=>s+t.amount,0);
-    const outstanding = Math.max(0, spend - paid);
-    if (spend === 0) return '';
+    const allSpends = transactions.filter(t=>t.category===card.spendCat&&t.type==='dr');
+    const allPaid   = transactions.filter(t=>t.category===card.credCat&&t.type==='dr');
+    const totalPaid = allPaid.reduce((s,t)=>s+t.amount,0);
+    if (allSpends.length === 0 && allPaid.length === 0) return '';
+
+    // Find the date of the most recent CRED payment
+    const lastPayment = allPaid.sort((a,b)=> new Date(b.date)-new Date(a.date))[0];
+
+    // Only count spends that happened after the last payment (fresh slate)
+    const freshSpends = lastPayment
+      ? allSpends.filter(t => new Date(t.date) >= new Date(lastPayment.date))
+      : allSpends;
+    const outstanding = freshSpends.reduce((s,t)=>s+t.amount,0);
+
     return `<div class="cc-card ${card.key}">
       <div class="cc-card-name">${card.label}</div>
       <div class="cc-card-bal">${fmt(outstanding)}</div>
-      <div class="cc-card-paid" style="color:var(--muted);">due &nbsp;|&nbsp; <span style="color:var(--green);">${fmt(paid)} paid</span></div>
+      <div class="cc-card-paid" style="color:var(--muted); font-size:10px; margin-top:4px;">
+        <span style="color:var(--red);">${fmt(outstanding)} this bill</span>&nbsp;|&nbsp;<span style="color:var(--green);">${fmt(totalPaid)} paid to date</span>
+      </div>
     </div>`;
   }).join('');
   document.getElementById('ccCardsRow').innerHTML = ccRowHTML || '';
