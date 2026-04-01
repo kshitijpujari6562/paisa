@@ -156,8 +156,8 @@
 
     .cc-note { font-size:11px; color:var(--teal); margin-top:3px; }
 
-    .savings-alert { margin:0 20px 16px; border-radius:16px; padding:16px; border:0.5px solid; display:none; }
-    .savings-alert.show { display:block; }
+    .savings-alert { margin:0 20px 16px; border-radius:16px; padding:16px; border:0.5px solid; display:block; }
+    .savings-alert.hidden { display:none; }
     .savings-alert.safe { background:rgba(52,211,153,0.08); border-color:rgba(52,211,153,0.25); }
     .savings-alert.warn { background:rgba(251,191,36,0.08); border-color:rgba(251,191,36,0.3); }
     .savings-alert.danger { background:rgba(248,113,113,0.08); border-color:rgba(248,113,113,0.3); }
@@ -626,28 +626,31 @@ function render() {
     ? recent.map(txnHTML).join('')
     : '<div class="empty-state">No transactions yet.<br>Tap <strong>Add</strong> and paste an SMS!</div>';
 
-  // Savings alert
+  // Savings alert — only actual bank debits count (not CC spends)
   const SAVINGS_GOAL = 10000;
+  const BANK_DEBIT_CATS = ['gpay','rent','utilities','sip','expense','cred_icici','cred_axis','cred_kotak','cred_amazon'];
   const monthIncome = transactions.filter(t=>isIncome(t.category)&&t.type==='cr').reduce((s,t)=>s+t.amount,0);
-  const monthSpend = transactions.filter(t=>t.type==='dr'&&!isCredPay(t.category)).reduce((s,t)=>s+t.amount,0);
-  const saved = Math.max(0, monthIncome - monthSpend);
-  const pct = Math.min(100, Math.round((saved / SAVINGS_GOAL) * 100));
+  const bankDebits = transactions.filter(t=>t.type==='dr'&&BANK_DEBIT_CATS.includes(t.category)).reduce((s,t)=>s+t.amount,0);
+  const saved = monthIncome - bankDebits;
+  const pct = monthIncome === 0 ? 0 : Math.min(100, Math.round((saved / SAVINGS_GOAL) * 100));
+  const state = saved >= SAVINGS_GOAL ? 'safe' : saved >= 5000 ? 'warn' : 'danger';
   const alertEl = document.getElementById('savingsAlert');
   const fillEl = document.getElementById('progressFill');
   const labelEl = document.getElementById('alertLabel');
   const subEl = document.getElementById('alertSub');
-  alertEl.classList.add('show');
-  alertEl.className = 'savings-alert show ' + (pct >= 100 ? 'safe' : pct >= 60 ? 'warn' : 'danger');
-  labelEl.className = 'alert-label ' + (pct >= 100 ? 'safe' : pct >= 60 ? 'warn' : 'danger');
-  labelEl.textContent = pct >= 100 ? 'Savings goal reached!' : pct >= 60 ? 'Savings on track' : monthIncome === 0 ? 'Monthly Savings' : 'Savings below target';
-  document.getElementById('alertVal').textContent = fmt(saved) + ' / ' + fmt(SAVINGS_GOAL);
-  fillEl.className = 'progress-fill ' + (pct >= 100 ? 'safe' : pct >= 60 ? 'warn' : 'danger');
-  fillEl.style.width = pct + '%';
+  alertEl.className = 'savings-alert ' + state;
+  labelEl.className = 'alert-label ' + state;
+  labelEl.textContent = saved >= SAVINGS_GOAL ? 'Savings goal reached!' : saved >= 5000 ? 'Savings on track' : monthIncome === 0 ? 'Monthly Savings' : 'Savings below target';
+  document.getElementById('alertVal').textContent = fmt(Math.max(0,saved)) + ' saved of ' + fmt(SAVINGS_GOAL) + ' goal';
+  fillEl.className = 'progress-fill ' + state;
+  fillEl.style.width = Math.max(0, pct) + '%';
   subEl.textContent = monthIncome === 0
-    ? 'Add income transactions to start tracking.'
-    : pct >= 100
-    ? 'Great job! You have saved ' + fmt(saved) + ' this month.'
-    : 'Save ' + fmt(SAVINGS_GOAL - saved) + ' more to hit your ₹10,000 goal.';
+    ? 'Add a Salary or Freelance credit to start tracking.'
+    : saved < 0
+    ? 'Overspent by ' + fmt(Math.abs(saved)) + ' this month.'
+    : saved >= SAVINGS_GOAL
+    ? 'Great job! ₹' + Math.max(0,saved-SAVINGS_GOAL).toLocaleString('en-IN') + ' above your goal.'
+    : 'Spend ' + fmt(saved < 0 ? 0 : SAVINGS_GOAL - saved) + ' less to hit your ₹10,000 goal. CC spends not counted.';
 
   // Food cards
   const foodApps = [
