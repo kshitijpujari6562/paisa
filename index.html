@@ -107,6 +107,7 @@
     .txn-icon.expense { background:rgba(124,106,247,0.12); }
     .txn-icon.salary,.txn-icon.freelance { background:rgba(52,211,153,0.12); }
     .txn-icon.rent { background:rgba(248,113,113,0.12); }
+    .txn-icon.sip { background:rgba(96,165,250,0.12); }
     .txn-icon.utilities { background:rgba(96,165,250,0.12); }
     .txn-info { flex:1; min-width:0; }
     .txn-merchant { font-size:13px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -121,6 +122,7 @@
     .tag-expense { background:rgba(124,106,247,0.12); color:var(--accent2); }
     .tag-salary,.tag-freelance { background:rgba(52,211,153,0.12); color:var(--green); }
     .tag-rent { background:rgba(248,113,113,0.12); color:var(--red); }
+    .tag-sip { background:rgba(96,165,250,0.12); color:var(--blue); }
     .tag-utilities { background:rgba(96,165,250,0.12); color:var(--blue); }
     .txn-amount { font-family:var(--mono); font-size:14px; font-weight:700; flex-shrink:0; }
     .txn-amount.dr { color:var(--red); } .txn-amount.cr { color:var(--green); }
@@ -250,6 +252,7 @@
               <option value="expense">Daily Expense</option>
               <option value="rent">Rent</option>
               <option value="utilities">Utilities</option>
+              <option value="sip">SIP Debit</option>
               <option value="gpay">GPay UPI</option>
             </optgroup>
             <optgroup label="Credit Card Spends">
@@ -340,13 +343,13 @@ document.getElementById('m-date').value = today.toISOString().split('T')[0];
 document.getElementById('monthBadge').textContent = today.toLocaleString('default',{month:'long'}) + ' ' + today.getFullYear();
 
 const CAT_LABEL = {
-  expense:'Expense', gpay:'GPay UPI', rent:'Rent', utilities:'Utilities',
+  expense:'Expense', gpay:'GPay UPI', rent:'Rent', utilities:'Utilities', sip:'SIP Debit',
   salary:'Salary', freelance:'Freelance',
   cc_icici:'ICICI Card', cc_axis:'Axis Card', cc_kotak:'Kotak Card', cc_amazon:'Amazon Card',
   cred_icici:'CRED→ICICI', cred_axis:'CRED→Axis', cred_kotak:'CRED→Kotak', cred_amazon:'CRED→Amazon'
 };
 const CAT_ICON = {
-  expense:'◈', gpay:'⬡', rent:'⌂', utilities:'⚡', salary:'⊕', freelance:'⊕',
+  expense:'◈', gpay:'⬡', rent:'⌂', utilities:'⚡', sip:'◑', salary:'⊕', freelance:'⊕',
   cc_icici:'▣', cc_axis:'▣', cc_kotak:'▣', cc_amazon:'▣',
   cred_icici:'✦', cred_axis:'✦', cred_kotak:'✦', cred_amazon:'✦'
 };
@@ -389,6 +392,7 @@ function parseSMS() {
   if (/salary|ctc|payroll/i.test(sms)) { category = 'salary'; type = 'cr'; }
   else if (/freelance|invoice/i.test(sms)) { category = 'freelance'; type = 'cr'; }
   else if (/rent/i.test(sms)) { category = 'rent'; }
+  else if (/sip|mutual fund|mf debit|systematic investment/i.test(sms)) { category = 'sip'; }
   else if (/electricity|water|gas|broadband|internet|utility/i.test(sms)) { category = 'utilities'; }
   else if (/cred/i.test(sms)) {
     if (/icici/i.test(sms)) category = 'cred_icici';
@@ -569,6 +573,7 @@ function render() {
     {key:'gpay',label:'GPay',color:'var(--teal)'},
     {key:'rent',label:'Rent',color:'var(--red)'},
     {key:'utilities',label:'Utils',color:'var(--blue)'},
+    {key:'sip',label:'SIP',color:'var(--accent2)'},
     {key:'cc_icici',label:'ICICI',color:'var(--orange)'},
     {key:'cc_axis',label:'Axis',color:'#f87171'},
     {key:'cc_kotak',label:'Kotak',color:'var(--amber)'},
@@ -585,7 +590,7 @@ function render() {
 
   // Breakdown
   const allCats = Object.keys(CAT_LABEL);
-  const catColors2 = { expense:'var(--accent)', gpay:'var(--teal)', rent:'var(--red)', utilities:'var(--blue)', salary:'var(--green)', freelance:'var(--green)', cc_icici:'var(--orange)', cc_axis:'var(--red)', cc_kotak:'var(--amber)', cc_amazon:'var(--blue)', cred_icici:'var(--amber)', cred_axis:'var(--amber)', cred_kotak:'var(--amber)', cred_amazon:'var(--amber)' };
+  const catColors2 = { expense:'var(--accent)', gpay:'var(--teal)', rent:'var(--red)', utilities:'var(--blue)', sip:'var(--accent2)', salary:'var(--green)', freelance:'var(--green)', cc_icici:'var(--orange)', cc_axis:'var(--red)', cc_kotak:'var(--amber)', cc_amazon:'var(--blue)', cred_icici:'var(--amber)', cred_axis:'var(--amber)', cred_kotak:'var(--amber)', cred_amazon:'var(--amber)' };
   const rows = allCats.map(c => {
     const tot = transactions.filter(t=>t.category===c).reduce((s,t)=>s+t.amount,0);
     if (!tot) return '';
