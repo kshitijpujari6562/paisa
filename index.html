@@ -61,19 +61,6 @@
     textarea:focus { border-color: var(--accent); }
     textarea::placeholder { color: var(--muted); font-size: 12px; }
 
-    .sms-box { margin: 0 20px 16px; }
-    .sms-label { font-size: 11px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px; }
-    .sms-label span { color: var(--accent2); }
-    .parse-btn { width:100%; margin-top:8px; background:var(--accent); border:none; border-radius:12px; padding:14px; color:#fff; font-size:14px; font-weight:700; font-family:var(--font); cursor:pointer; }
-    .parse-result { margin-top:10px; background:var(--surface2); border:0.5px solid var(--border2); border-radius:12px; padding:14px; display:none; }
-    .parse-result.show { display:block; }
-    .parse-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:7px; }
-    .parse-key { color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:1px; }
-    .parse-val { font-weight:600; font-family:var(--mono); font-size:13px; }
-    .parse-actions { display:flex; gap:8px; margin-top:12px; }
-    .btn-add { flex:1; padding:11px; background:var(--green); border:none; border-radius:10px; color:#052e16; font-weight:700; font-size:13px; cursor:pointer; font-family:var(--font); }
-    .btn-discard { flex:1; padding:11px; background:var(--surface3); border:0.5px solid var(--border); border-radius:10px; color:var(--muted); font-size:13px; cursor:pointer; font-family:var(--font); }
-
     .manual-form { margin:0 20px 16px; background:var(--surface); border:0.5px solid var(--border); border-radius:16px; padding:16px; }
     .form-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px; }
     .form-group { display:flex; flex-direction:column; gap:5px; }
@@ -267,24 +254,7 @@
 
   <!-- ADD -->
   <div class="section" id="sec-add">
-    <div class="sms-box">
-      <div class="sms-label">Paste SMS / Notification <span>↓</span></div>
-      <textarea id="smsInput" placeholder="Paste a GPay, CRED, bank, or credit card SMS here...&#10;&#10;e.g. Rs.2500 debited from ICICI CC XX1234 at Zomato"></textarea>
-      <button class="parse-btn" onclick="parseSMS()">Parse &amp; Extract Transaction</button>
-      <div class="parse-result" id="parseResult">
-        <div class="parse-row"><span class="parse-key">Merchant</span><span class="parse-val" id="pr-merchant">—</span></div>
-        <div class="parse-row"><span class="parse-key">Amount</span><span class="parse-val" id="pr-amount">—</span></div>
-        <div class="parse-row"><span class="parse-key">Type</span><span class="parse-val" id="pr-type">—</span></div>
-        <div class="parse-row"><span class="parse-key">Source</span><span class="parse-val" id="pr-source">—</span></div>
-        <div class="parse-row"><span class="parse-key">Date</span><span class="parse-val" id="pr-date">—</span></div>
-        <div class="parse-actions">
-          <button class="btn-add" onclick="confirmAdd()">Add Transaction</button>
-          <button class="btn-discard" onclick="discardParse()">Discard</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="section-sep">Or Add Manually</div>
+    <div class="section-sep" style="padding-top:4px;">Add Transaction</div>
     <div class="manual-form">
       <div class="form-row">
         <div class="form-group">
@@ -393,7 +363,6 @@
 
 <script>
 let transactions = JSON.parse(localStorage.getItem('paisa_txns2') || '[]');
-let parsedTxn = null;
 let activeFilter = 'all';
 let manualType = 'dr';
 
@@ -432,94 +401,8 @@ function isIncome(cat) { return cat === 'salary' || cat === 'freelance'; }
 function ccKeyFromCred(credCat) { return credCat ? credCat.replace('cred_','') : null; }
 function ccKeyFromCC(ccCat) { return ccCat ? ccCat.replace('cc_','') : null; }
 
-async function parseSMS() {
-  const sms = document.getElementById('smsInput').value.trim();
-  if (!sms) { alert('Please paste an SMS first.'); return; }
-
-  const btn = document.querySelector('.parse-btn');
-  btn.textContent = 'Parsing...';
-  btn.disabled = true;
-
-  try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 300,
-        system: `You are a precise Indian bank SMS parser. Extract transaction details and return ONLY valid JSON, no explanation, no markdown.
-
-Categories to pick from:
-- "salary" — salary/payroll credit
-- "freelance" — freelance/invoice credit
-- "expense" — general daily expense debit
-- "rent" — rent payment
-- "utilities" — electricity, water, gas, broadband
-- "sip" — SIP / mutual fund debit
-- "gpay" — any UPI / GPay / PhonePe / BHIM payment
-- "cc_icici" — ICICI credit card spend
-- "cc_axis" — Axis credit card spend
-- "cc_kotak" — Kotak credit card spend
-- "cc_amazon" — Amazon Pay card spend
-- "cred_icici" — CRED payment towards ICICI bill
-- "cred_axis" — CRED payment towards Axis bill
-- "cred_kotak" — CRED payment towards Kotak bill
-- "cred_amazon" — CRED payment towards Amazon bill
-
-Rules:
-- type is "dr" for debits/payments/spends, "cr" for credits/salary/refunds/cashbacks
-- Any SMS with UPI in it = gpay category (debit)
-- CC spend SMS = relevant cc_ category (debit)
-- CRED bill payment = relevant cred_ category (debit)
-- Salary/payroll = salary (credit)
-- Merchant: extract the actual merchant/payee name, not the bank name
-- If merchant is unclear use "Transaction"
-- Date format: DD-MM-YYYY, if not found use today
-
-Return JSON exactly like: {"amount": 1234.56, "merchant": "Swiggy", "type": "dr", "category": "gpay", "date": "01-04-2026"}`,
-        messages: [{ role: 'user', content: sms }]
-      })
-    });
-
-    const data = await response.json();
-    const text = data.content[0].text.trim().replace(/```json|```/g, '').trim();
-    const parsed = JSON.parse(text);
-
-    parsedTxn = {
-      amount: parseFloat(parsed.amount) || 0,
-      merchant: parsed.merchant || 'Transaction',
-      type: parsed.type === 'cr' ? 'cr' : 'dr',
-      category: parsed.category || 'expense',
-      date: parsed.date || today.toLocaleDateString('en-IN')
-    };
-
-    document.getElementById('pr-merchant').textContent = parsedTxn.merchant;
-    document.getElementById('pr-amount').textContent = fmt(parsedTxn.amount);
-    document.getElementById('pr-type').textContent = parsedTxn.type === 'dr' ? '↓ Debit' : '↑ Credit';
-    document.getElementById('pr-source').textContent = CAT_LABEL[parsedTxn.category] || parsedTxn.category;
-    document.getElementById('pr-date').textContent = parsedTxn.date;
-    document.getElementById('parseResult').classList.add('show');
-
-  } catch(e) {
-    alert('Could not parse SMS. Please try again or use manual entry.');
-    console.error(e);
-  } finally {
-    btn.textContent = 'Parse & Extract Transaction';
-    btn.disabled = false;
-  }
-}
-
-function confirmAdd() {
-  if (!parsedTxn || !parsedTxn.amount) { alert('Could not parse amount. Try manual entry.'); return; }
-  addTransaction(parsedTxn);
-  document.getElementById('smsInput').value = '';
-  document.getElementById('parseResult').classList.remove('show');
-  parsedTxn = null;
-  showToast('Transaction added!');
-  switchNav('home', document.querySelectorAll('.nav-item')[0]);
-}
-
-function discardParse() { document.getElementById('parseResult').classList.remove('show'); parsedTxn = null; }
+function confirmAdd() {}
+function discardParse() {}
 
 function onCatChange() {
   const cat = document.getElementById('m-category').value;
