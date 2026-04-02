@@ -302,6 +302,11 @@
       <div class="form-row">
         <div class="form-group">
           <label>Merchant / Note</label>
+          <div style="display:flex;gap:6px;margin-bottom:6px;">
+            <div onclick="setMerchant('Swiggy')" style="padding:4px 10px;border-radius:20px;background:rgba(251,146,60,0.1);border:0.5px solid rgba(251,146,60,0.3);color:var(--orange);font-size:11px;cursor:pointer;">🍊 Swiggy</div>
+            <div onclick="setMerchant('Zomato')" style="padding:4px 10px;border-radius:20px;background:rgba(248,113,113,0.1);border:0.5px solid rgba(248,113,113,0.3);color:var(--red);font-size:11px;cursor:pointer;">🍅 Zomato</div>
+            <div onclick="setMerchant('Blinkit')" style="padding:4px 10px;border-radius:20px;background:rgba(251,191,36,0.1);border:0.5px solid rgba(251,191,36,0.3);color:var(--amber);font-size:11px;cursor:pointer;">🛒 Blinkit</div>
+          </div>
           <input type="text" id="m-merchant" placeholder="Swiggy, Salary..." />
         </div>
         <div class="form-group">
@@ -403,6 +408,8 @@ function ccKeyFromCC(ccCat) { return ccCat ? ccCat.replace('cc_','') : null; }
 
 function confirmAdd() {}
 function discardParse() {}
+
+function setMerchant(name) { document.getElementById('m-merchant').value = name; }
 
 function onCatChange() {
   const cat = document.getElementById('m-category').value;
@@ -574,7 +581,7 @@ function render() {
   ];
   let anyFood = false;
   foodApps.forEach(app => {
-    const orders = transactions.filter(t=>t.type==='dr'&&app.re.test(t.merchant));
+    const orders = transactions.filter(t=>t.type==='dr'&&(app.re.test(t.merchant)||app.re.test(t.category)));
     const total = orders.reduce((s,t)=>s+t.amount,0);
     if (total > 0) anyFood = true;
     document.getElementById(app.id+'Amt').textContent = fmt(total);
