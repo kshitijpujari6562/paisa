@@ -244,10 +244,10 @@
       </div>
     </div>
 
-    <div class="txn-section">
-      <div class="section-header"><div class="section-title">Recent Transactions</div></div>
-      <div class="txn-list" id="recentList">
-        <div class="empty-state">No transactions yet.<br>Tap <strong>Add</strong> and paste an SMS!</div>
+    <div style="padding:0 20px 16px;">
+      <div onclick="switchNav('txns', document.querySelectorAll('.nav-item')[2])" style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:0.5px solid var(--border2);border-radius:14px;padding:16px;cursor:pointer;">
+        <span style="font-size:13px;font-weight:600;">View All Transactions</span>
+        <span style="color:var(--accent2);font-size:18px;">→</span>
       </div>
     </div>
   </div>
@@ -541,11 +541,6 @@ function render() {
   // CRED coins from all CRED payments
   const credCoins = Math.floor(credPaid / 100);
   document.getElementById('credCoins').textContent = credCoins.toLocaleString('en-IN');
-
-  const recent = transactions.slice(0,6);
-  document.getElementById('recentList').innerHTML = recent.length
-    ? recent.map(txnHTML).join('')
-    : '<div class="empty-state">No transactions yet.<br>Tap <strong>Add</strong> and paste an SMS!</div>';
 
   // Savings alert — only actual bank debits count (not CC spends)
   const SAVINGS_GOAL = 10000;
