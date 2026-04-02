@@ -432,62 +432,81 @@ function isIncome(cat) { return cat === 'salary' || cat === 'freelance'; }
 function ccKeyFromCred(credCat) { return credCat ? credCat.replace('cred_','') : null; }
 function ccKeyFromCC(ccCat) { return ccCat ? ccCat.replace('cc_','') : null; }
 
-function parseSMS() {
+async function parseSMS() {
   const sms = document.getElementById('smsInput').value.trim();
   if (!sms) { alert('Please paste an SMS first.'); return; }
 
-  let amount = 0, merchant = 'Transaction', type = 'dr', category = 'expense';
+  const btn = document.querySelector('.parse-btn');
+  btn.textContent = 'Parsing...';
+  btn.disabled = true;
 
-  const amtPatterns = [
-    /(?:rs\.?|inr|₹)\s*([\d,]+(?:\.\d{1,2})?)/i,
-    /([\d,]+(?:\.\d{1,2})?)\s*(?:rs\.?|inr|₹)/i,
-    /(?:debited|credited|paid|spent|received|amount)\s+(?:of\s+)?(?:rs\.?|inr|₹)?\s*([\d,]+)/i
-  ];
-  for (const p of amtPatterns) { const m = sms.match(p); if (m) { amount = parseFloat(m[1].replace(/,/g,'')); break; } }
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 300,
+        system: `You are a precise Indian bank SMS parser. Extract transaction details and return ONLY valid JSON, no explanation, no markdown.
 
-  const isCredit = /credited|received|refund|cashback|reward|reversed|money added|salary|credit/i.test(sms);
-  type = isCredit ? 'cr' : 'dr';
+Categories to pick from:
+- "salary" — salary/payroll credit
+- "freelance" — freelance/invoice credit
+- "expense" — general daily expense debit
+- "rent" — rent payment
+- "utilities" — electricity, water, gas, broadband
+- "sip" — SIP / mutual fund debit
+- "gpay" — any UPI / GPay / PhonePe / BHIM payment
+- "cc_icici" — ICICI credit card spend
+- "cc_axis" — Axis credit card spend
+- "cc_kotak" — Kotak credit card spend
+- "cc_amazon" — Amazon Pay card spend
+- "cred_icici" — CRED payment towards ICICI bill
+- "cred_axis" — CRED payment towards Axis bill
+- "cred_kotak" — CRED payment towards Kotak bill
+- "cred_amazon" — CRED payment towards Amazon bill
 
-  if (/salary|ctc|payroll/i.test(sms)) { category = 'salary'; type = 'cr'; }
-  else if (/freelance|invoice/i.test(sms)) { category = 'freelance'; type = 'cr'; }
-  else if (/rent/i.test(sms)) { category = 'rent'; }
-  else if (/sip|mutual fund|mf debit|systematic investment/i.test(sms)) { category = 'sip'; }
-  else if (/electricity|water|gas|broadband|internet|utility/i.test(sms)) { category = 'utilities'; }
-  else if (/cred/i.test(sms)) {
-    if (/icici/i.test(sms)) category = 'cred_icici';
-    else if (/axis/i.test(sms)) category = 'cred_axis';
-    else if (/kotak/i.test(sms)) category = 'cred_kotak';
-    else if (/amazon/i.test(sms)) category = 'cred_amazon';
-    else category = 'cred_icici';
+Rules:
+- type is "dr" for debits/payments/spends, "cr" for credits/salary/refunds/cashbacks
+- Any SMS with UPI in it = gpay category (debit)
+- CC spend SMS = relevant cc_ category (debit)
+- CRED bill payment = relevant cred_ category (debit)
+- Salary/payroll = salary (credit)
+- Merchant: extract the actual merchant/payee name, not the bank name
+- If merchant is unclear use "Transaction"
+- Date format: DD-MM-YYYY, if not found use today
+
+Return JSON exactly like: {"amount": 1234.56, "merchant": "Swiggy", "type": "dr", "category": "gpay", "date": "01-04-2026"}`,
+        messages: [{ role: 'user', content: sms }]
+      })
+    });
+
+    const data = await response.json();
+    const text = data.content[0].text.trim().replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(text);
+
+    parsedTxn = {
+      amount: parseFloat(parsed.amount) || 0,
+      merchant: parsed.merchant || 'Transaction',
+      type: parsed.type === 'cr' ? 'cr' : 'dr',
+      category: parsed.category || 'expense',
+      date: parsed.date || today.toLocaleDateString('en-IN')
+    };
+
+    document.getElementById('pr-merchant').textContent = parsedTxn.merchant;
+    document.getElementById('pr-amount').textContent = fmt(parsedTxn.amount);
+    document.getElementById('pr-type').textContent = parsedTxn.type === 'dr' ? '↓ Debit' : '↑ Credit';
+    document.getElementById('pr-source').textContent = CAT_LABEL[parsedTxn.category] || parsedTxn.category;
+    document.getElementById('pr-date').textContent = parsedTxn.date;
+    document.getElementById('parseResult').classList.add('show');
+
+  } catch(e) {
+    alert('Could not parse SMS. Please try again or use manual entry.');
+    console.error(e);
+  } finally {
+    btn.textContent = 'Parse & Extract Transaction';
+    btn.disabled = false;
   }
-  else if (/icici/i.test(sms)) category = 'cc_icici';
-  else if (/axis/i.test(sms)) category = 'cc_axis';
-  else if (/kotak/i.test(sms)) category = 'cc_kotak';
-  else if (/amazon pay|amazon card/i.test(sms)) category = 'cc_amazon';
-  else if (/gpay|google pay|upi|bhim|phonepe/i.test(sms)) category = 'gpay';
-
-  // Detect food merchants and override merchant name nicely
-  if (/swiggy/i.test(sms)) merchant = 'Swiggy';
-  else if (/zomato/i.test(sms)) merchant = 'Zomato';
-  else if (/blinkit|grofers/i.test(sms)) merchant = 'Blinkit';
-
-  const merchantPatterns = [
-    /(?:to|at|for|towards)\s+([A-Za-z0-9&\s]+?)(?:\s+(?:via|on|ref|upi|a\/c|vpa|\.|\,|$))/i,
-    /paid\s+(?:to\s+)?([A-Za-z0-9&\s]+?)(?:\s+(?:via|using|on|ref|$))/i,
-  ];
-  for (const p of merchantPatterns) { const m = sms.match(p); if (m && m[1].trim().length > 1) { merchant = m[1].trim().replace(/\s+/g,' '); break; } }
-
-  const dateMatch = sms.match(/(\d{1,2}[-\/]\d{1,2}[-\/]\d{2,4})/);
-  const txnDate = dateMatch ? dateMatch[1] : today.toLocaleDateString('en-IN');
-
-  parsedTxn = { amount, merchant, type, category, date: txnDate };
-
-  document.getElementById('pr-merchant').textContent = merchant;
-  document.getElementById('pr-amount').textContent = fmt(amount);
-  document.getElementById('pr-type').textContent = type === 'dr' ? '↓ Debit' : '↑ Credit';
-  document.getElementById('pr-source').textContent = CAT_LABEL[category] || category;
-  document.getElementById('pr-date').textContent = txnDate;
-  document.getElementById('parseResult').classList.add('show');
 }
 
 function confirmAdd() {
