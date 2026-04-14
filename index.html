@@ -165,6 +165,21 @@
     .food-card-name { font-size:9px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; margin-bottom:4px; }
     .food-card-amt { font-size:15px; font-weight:800; font-family:var(--mono); color:var(--red); }
     .food-card-count { font-size:10px; color:var(--muted); margin-top:2px; }
+
+    .emi-form { margin:0 20px 16px; background:var(--surface); border:0.5px solid rgba(96,165,250,0.25); border-radius:16px; padding:16px; }
+    .emi-list { display:flex; flex-direction:column; gap:8px; margin:0 20px 16px; }
+    .emi-item { background:var(--surface); border:0.5px solid var(--border); border-radius:14px; padding:14px; }
+    .emi-item-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; }
+    .emi-item-name { font-size:13px; font-weight:600; }
+    .emi-item-card { font-size:10px; color:var(--muted); margin-top:2px; letter-spacing:0.5px; }
+    .emi-item-monthly { font-size:16px; font-weight:800; font-family:var(--mono); color:var(--blue); }
+    .emi-item-sub { font-size:10px; color:var(--muted); margin-top:1px; }
+    .emi-progress-track { background:rgba(255,255,255,0.06); border-radius:10px; height:4px; overflow:hidden; margin-top:8px; }
+    .emi-progress-fill { height:100%; border-radius:10px; background:var(--blue); transition:width 0.5s ease; }
+    .emi-del { background:none; border:none; color:var(--muted); font-size:12px; cursor:pointer; padding:2px 4px; }
+    .add-type-toggle { display:flex; gap:8px; padding:0 20px; margin-bottom:14px; }
+    .add-type-btn { flex:1; padding:10px; border-radius:12px; border:0.5px solid var(--border); background:var(--surface); color:var(--muted); font-size:12px; font-weight:600; cursor:pointer; font-family:var(--font); text-align:center; }
+    .add-type-btn.active { background:var(--accent); border-color:var(--accent); color:#fff; }
   </style>
 </head>
 <body>
@@ -255,6 +270,14 @@
   <!-- ADD -->
   <div class="section" id="sec-add">
     <div class="section-sep" style="padding-top:4px;">Add Transaction</div>
+
+    <div class="add-type-toggle">
+      <div class="add-type-btn active" id="tab-txn" onclick="switchAddTab('txn')">Transaction</div>
+      <div class="add-type-btn" id="tab-emi" onclick="switchAddTab('emi')">EMI</div>
+    </div>
+
+    <!-- Transaction form -->
+    <div id="form-txn">
     <div class="manual-form">
       <div class="form-row">
         <div class="form-group">
@@ -318,6 +341,52 @@
     </div>
   </div>
 
+    <!-- EMI form -->
+    <div id="form-emi" style="display:none;">
+      <div class="emi-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Item / Note</label>
+            <input type="text" id="emi-name" placeholder="MacBook, iPhone..." />
+          </div>
+          <div class="form-group">
+            <label>Total Amount (₹)</label>
+            <input type="number" inputmode="decimal" id="emi-total" placeholder="30000" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Months</label>
+            <input type="number" inputmode="numeric" id="emi-months" placeholder="6" />
+          </div>
+          <div class="form-group">
+            <label>Card</label>
+            <select id="emi-card">
+              <option value="cc_icici">ICICI</option>
+              <option value="cc_axis">Axis</option>
+              <option value="cc_kotak">Kotak</option>
+              <option value="cc_amazon">Amazon</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group form-full">
+            <label>Start Date</label>
+            <input type="date" id="emi-date" />
+          </div>
+        </div>
+        <div id="emi-preview" style="display:none;background:var(--surface2);border-radius:10px;padding:12px;margin-bottom:10px;font-size:13px;">
+          <span style="color:var(--muted);">Monthly instalment: </span><span id="emi-preview-val" style="color:var(--blue);font-weight:700;font-family:var(--mono);"></span>
+        </div>
+        <button class="add-manual-btn" style="border-color:var(--blue);color:var(--blue);" onclick="addEMI()">Add EMI</button>
+      </div>
+
+      <div style="padding:0 20px;margin-bottom:10px;font-size:11px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;">Active EMIs</div>
+      <div class="emi-list" id="emiList"><div class="empty-state" style="padding:20px;">No EMIs added yet.</div></div>
+    </div>
+
+  </div>
+
   <!-- HISTORY -->
   <div class="section" id="sec-txns">
     <div class="txn-section">
@@ -356,6 +425,10 @@
       <div class="section-header"><div class="section-title">Full Breakdown</div></div>
       <div id="breakdown"></div>
     </div>
+    <div style="padding:0 20px;margin-top:20px;">
+      <div style="font-size:11px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;">Monthly EMI Burden</div>
+      <div id="analyticsEMI"><div class="empty-state" style="padding:20px;">No active EMIs.</div></div>
+    </div>
   </div>
 
   <div class="bottom-nav">
@@ -373,6 +446,7 @@ let manualType = 'dr';
 
 const today = new Date();
 document.getElementById('m-date').value = today.toISOString().split('T')[0];
+document.getElementById('emi-date').value = today.toISOString().split('T')[0];
 document.getElementById('monthBadge').textContent = today.toLocaleString('default',{month:'long'}) + ' ' + today.getFullYear();
 
 const CAT_LABEL = {
@@ -398,6 +472,98 @@ function save() { localStorage.setItem('paisa_txns2', JSON.stringify(transaction
 function showToast(msg) {
   const t = document.getElementById('toast'); t.textContent = msg;
   t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+let emis = JSON.parse(localStorage.getItem('paisa_emis') || '[]');
+function saveEMIs() { localStorage.setItem('paisa_emis', JSON.stringify(emis)); }
+
+const CC_CARD_LABELS = { cc_icici:'ICICI', cc_axis:'Axis', cc_kotak:'Kotak', cc_amazon:'Amazon' };
+
+function switchAddTab(tab) {
+  document.getElementById('form-txn').style.display = tab === 'txn' ? 'block' : 'none';
+  document.getElementById('form-emi').style.display = tab === 'emi' ? 'block' : 'none';
+  document.getElementById('tab-txn').classList.toggle('active', tab === 'txn');
+  document.getElementById('tab-emi').classList.toggle('active', tab === 'emi');
+  if (tab === 'emi') renderEMIs();
+}
+
+function addEMI() {
+  const name    = document.getElementById('emi-name').value.trim();
+  const total   = parseFloat(document.getElementById('emi-total').value);
+  const months  = parseInt(document.getElementById('emi-months').value);
+  const card    = document.getElementById('emi-card').value;
+  const date    = document.getElementById('emi-date').value || today.toISOString().split('T')[0];
+  if (!name || !total || !months || months < 1) { alert('Please fill in all EMI fields.'); return; }
+  const monthly = Math.round(total / months);
+  emis.unshift({ id: Date.now(), name, total, months, card, date, monthly, paid: 0 });
+  saveEMIs();
+  renderEMIs();
+  render();
+  document.getElementById('emi-name').value = '';
+  document.getElementById('emi-total').value = '';
+  document.getElementById('emi-months').value = '';
+  document.getElementById('emi-preview').style.display = 'none';
+  showToast('EMI added!');
+}
+
+document.getElementById('emi-total').addEventListener('input', updateEMIPreview);
+document.getElementById('emi-months').addEventListener('input', updateEMIPreview);
+function updateEMIPreview() {
+  const total = parseFloat(document.getElementById('emi-total').value);
+  const months = parseInt(document.getElementById('emi-months').value);
+  const prev = document.getElementById('emi-preview');
+  if (total > 0 && months > 0) {
+    document.getElementById('emi-preview-val').textContent = fmt(Math.round(total/months)) + ' / month';
+    prev.style.display = 'block';
+  } else { prev.style.display = 'none'; }
+}
+
+function deleteEMI(id) {
+  if (!confirm('Remove this EMI?')) return;
+  emis = emis.filter(e => e.id !== id);
+  saveEMIs(); renderEMIs(); render();
+}
+
+function renderEMIs() {
+  const list = document.getElementById('emiList');
+  if (!list) return;
+  if (!emis.length) { list.innerHTML = '<div class="empty-state" style="padding:20px;">No EMIs added yet.</div>'; return; }
+  list.innerHTML = emis.map(e => {
+    const remaining = e.months - e.paid;
+    const pct = Math.round((e.paid / e.months) * 100);
+    return `<div class="emi-item">
+      <div class="emi-item-top">
+        <div>
+          <div class="emi-item-name">${e.name}</div>
+          <div class="emi-item-card">${CC_CARD_LABELS[e.card]||e.card} · ${e.months} months · started ${e.date}</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="emi-item-monthly">${fmt(e.monthly)}<span style="font-size:10px;color:var(--muted);font-weight:400;">/mo</span></div>
+          <div class="emi-item-sub">${remaining} of ${e.months} left</div>
+        </div>
+      </div>
+      <div class="emi-progress-track"><div class="emi-progress-fill" style="width:${pct}%"></div></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+        <span style="font-size:10px;color:var(--muted);">${fmt(e.paid * e.monthly)} paid · ${fmt(remaining * e.monthly)} remaining</span>
+        <div style="display:flex;gap:6px;">
+          <button onclick="markEMIPaid(${e.id})" style="padding:4px 10px;background:rgba(52,211,153,0.1);border:0.5px solid rgba(52,211,153,0.3);border-radius:8px;color:var(--green);font-size:10px;cursor:pointer;font-family:var(--font);">Mark paid</button>
+          <button class="emi-del" onclick="deleteEMI(${e.id})">✕</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function markEMIPaid(id) {
+  const emi = emis.find(e => e.id === id);
+  if (!emi) return;
+  if (emi.paid >= emi.months) { showToast('EMI fully paid off!'); return; }
+  emi.paid += 1;
+  // Auto-add this month's instalment as a CC spend transaction
+  addTransaction({ amount: emi.monthly, merchant: emi.name + ' EMI', type: 'dr', category: emi.card, date: today.toISOString().split('T')[0] });
+  saveEMIs(); renderEMIs();
+  if (emi.paid >= emi.months) showToast('EMI fully paid off!');
+  else showToast('EMI instalment recorded!');
 }
 
 function isCCSpend(cat) { return cat && cat.startsWith('cc_'); }
@@ -626,6 +792,30 @@ function render() {
     </div>`;
   }).join('');
   document.getElementById('breakdown').innerHTML = rows || '<div class="empty-state">No data yet.</div>';
+
+  // EMI analytics summary
+  const analyticsEMI = document.getElementById('analyticsEMI');
+  if (analyticsEMI) {
+    const activeEMIs = emis.filter(e => e.paid < e.months);
+    if (!activeEMIs.length) {
+      analyticsEMI.innerHTML = '<div class="empty-state" style="padding:20px;">No active EMIs.</div>';
+    } else {
+      const totalMonthly = activeEMIs.reduce((s,e)=>s+e.monthly,0);
+      analyticsEMI.innerHTML = `
+        <div style="background:rgba(96,165,250,0.08);border:0.5px solid rgba(96,165,250,0.2);border-radius:14px;padding:14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:12px;color:var(--muted);">Total monthly EMIs</span>
+          <span style="font-family:var(--mono);font-weight:800;font-size:18px;color:var(--blue);">${fmt(totalMonthly)}</span>
+        </div>
+        ${activeEMIs.map(e=>`
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:0.5px solid var(--border);">
+          <div>
+            <div style="font-size:13px;font-weight:600;">${e.name}</div>
+            <div style="font-size:10px;color:var(--muted);">${CC_CARD_LABELS[e.card]} · ${e.months-e.paid} months left</div>
+          </div>
+          <span style="font-family:var(--mono);font-weight:700;color:var(--blue);">${fmt(e.monthly)}/mo</span>
+        </div>`).join('')}`;
+    }
+  }
 }
 
 function switchNav(section, el) {
