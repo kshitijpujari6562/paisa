@@ -472,12 +472,35 @@ const CAT_ICON = {
   cred_icici:'✦', cred_axis:'✦', cred_kotak:'✦', cred_amazon:'✦'
 };
 const CC_CARDS = [
-  { key:'icici', label:'ICICI Card', spendCat:'cc_icici', credCat:'cred_icici' },
-  { key:'axis',  label:'Axis Card',  spendCat:'cc_axis',  credCat:'cred_axis'  },
-  { key:'kotak', label:'Kotak Card', spendCat:'cc_kotak', credCat:'cred_kotak' },
-  { key:'amazon',label:'Amazon Card',spendCat:'cc_amazon',credCat:'cred_amazon'}
+  { key:'icici',  label:'ICICI Card',  spendCat:'cc_icici',  credCat:'cred_icici',  cycleDay: 25 },
+  { key:'axis',   label:'Axis Card',   spendCat:'cc_axis',   credCat:'cred_axis',   cycleDay: 12 },
+  { key:'kotak',  label:'Kotak Card',  spendCat:'cc_kotak',  credCat:'cred_kotak',  cycleDay: 5  },
+  { key:'amazon', label:'Amazon Card', spendCat:'cc_amazon', credCat:'cred_amazon', cycleDay: 12 }
 ];
 const CC_CARD_LABELS = { cc_icici:'ICICI', cc_axis:'Axis', cc_kotak:'Kotak', cc_amazon:'Amazon' };
+
+// Returns { start, end } Date objects for the current billing cycle
+// cycleDay = day of month the cycle starts (e.g. 12 means 12th of each month)
+function getCurrentCycle(cycleDay) {
+  const now = today;
+  const d = now.getDate();
+  let cycleStart, cycleEnd;
+  if (d >= cycleDay) {
+    // We're past the cycle start day — cycle started this month
+    cycleStart = new Date(now.getFullYear(), now.getMonth(), cycleDay);
+    cycleEnd   = new Date(now.getFullYear(), now.getMonth() + 1, cycleDay - 1);
+  } else {
+    // We're before the cycle start day — cycle started last month
+    cycleStart = new Date(now.getFullYear(), now.getMonth() - 1, cycleDay);
+    cycleEnd   = new Date(now.getFullYear(), now.getMonth(), cycleDay - 1);
+  }
+  cycleEnd.setHours(23, 59, 59);
+  return { start: cycleStart, end: cycleEnd };
+}
+
+function fmtCycleDate(d) {
+  return d.getDate() + ' ' + d.toLocaleString('default', { month: 'short' });
+}
 
 function fmt(n) { return '₹' + Math.abs(n).toLocaleString('en-IN',{minimumFractionDigits:0,maximumFractionDigits:0}); }
 function save() { localStorage.setItem('paisa_txns2', JSON.stringify(transactions)); }
@@ -703,18 +726,26 @@ function render() {
   document.getElementById('dailyAvg').textContent = fmt(totalExpDr/days);
 
   const ccRowHTML = CC_CARDS.map(card => {
+    const cycle = getCurrentCycle(card.cycleDay);
     const allSpends = transactions.filter(t=>t.category===card.spendCat&&t.type==='dr');
     const allPaid   = transactions.filter(t=>t.category===card.credCat&&t.type==='dr');
     const totalPaid = allPaid.reduce((s,t)=>s+t.amount,0);
     if (allSpends.length === 0 && allPaid.length === 0) return '';
-    const lastPayment = allPaid.sort((a,b)=> new Date(b.date)-new Date(a.date))[0];
-    const freshSpends = lastPayment ? allSpends.filter(t => new Date(t.date) >= new Date(lastPayment.date)) : allSpends;
-    const outstanding = freshSpends.reduce((s,t)=>s+t.amount,0);
+    // Only count spends within the current billing cycle
+    const cycleSpends = allSpends.filter(t => {
+      const d = new Date(t.date);
+      return d >= cycle.start && d <= cycle.end;
+    });
+    const outstanding = cycleSpends.reduce((s,t)=>s+t.amount,0);
+    const cycleLabel = fmtCycleDate(cycle.start) + ' – ' + fmtCycleDate(cycle.end);
     return `<div class="cc-card ${card.key}">
       <div class="cc-card-name">${card.label}</div>
       <div class="cc-card-bal">${fmt(outstanding)}</div>
       <div class="cc-card-paid" style="color:var(--muted); font-size:10px; margin-top:4px;">
-        <span style="color:var(--red);">${fmt(outstanding)} this bill</span>&nbsp;|&nbsp;<span style="color:var(--green);">${fmt(totalPaid)} paid to date</span>
+        <span style="color:var(--muted);">${cycleLabel}</span>
+      </div>
+      <div style="font-size:10px;margin-top:3px;">
+        <span style="color:var(--red);">${fmt(outstanding)} this cycle</span>&nbsp;|&nbsp;<span style="color:var(--green);">${fmt(totalPaid)} paid to date</span>
       </div>
     </div>`;
   }).join('');
