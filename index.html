@@ -403,15 +403,11 @@
       <div class="section-header">
         <div class="section-title">All Transactions</div>
         <div class="filter-row">
-<div class="filter-chip active" onclick="setFilter('all',this)">All</div>
-<div class="filter-chip" onclick="setFilter('gpay',this)">GPay</div>
-<div class="filter-chip" onclick="setFilter('cc',this)">All Cards</div>
-<div class="filter-chip" onclick="setFilter('cc_icici',this)">ICICI</div>
-<div class="filter-chip" onclick="setFilter('cc_axis',this)">Axis</div>
-<div class="filter-chip" onclick="setFilter('cc_kotak',this)">Kotak</div>
-<div class="filter-chip" onclick="setFilter('cc_amazon',this)">Amazon</div>
-<div class="filter-chip" onclick="setFilter('cred',this)">CRED</div>
-<div class="filter-chip" onclick="setFilter('income',this)">Income</div>
+          <div class="filter-chip active" onclick="setFilter('all',this)">All</div>
+          <div class="filter-chip" onclick="setFilter('gpay',this)">GPay</div>
+          <div class="filter-chip" onclick="setFilter('cc',this)">Cards</div>
+          <div class="filter-chip" onclick="setFilter('cred',this)">CRED</div>
+          <div class="filter-chip" onclick="setFilter('income',this)">Income</div>
         </div>
       </div>
       <div class="txn-list" id="fullList">
@@ -579,9 +575,6 @@ function filterMatch(t) {
   if (activeFilter === 'cc') return isCCSpend(t.category);
   if (activeFilter === 'cred') return isCredPay(t.category);
   if (activeFilter === 'income') return isIncome(t.category);
-  // granular filters
-  if (activeFilter.startsWith('cc_')) return t.category === activeFilter;
-  if (activeFilter.startsWith('cred_')) return t.category === activeFilter;
   return true;
 }
 
@@ -739,39 +732,13 @@ function render() {
     const totalPaid = allPaid.reduce((s,t)=>s+t.amount,0);
     if (allSpends.length === 0 && allPaid.length === 0) return '';
     // Only count spends within the current billing cycle
-   // CURRENT CYCLE
-const cycleSpends = allSpends.filter(t => {
-  const d = new Date(t.date);
-  return d >= cycle.start && d <= cycle.end;
-});
-// NEXT CYCLE
-const nextCycleSpends = allSpends.filter(t => {
-  const d = new Date(t.date);
-  return d > cycle.end;
-});
-const totalCycleSpend = cycleSpends.reduce((s,t)=>s+t.amount,0);
-// PAYMENTS made after cycle start
-const totalPaidThisCycle = allPaid.filter(t => {
-  const d = new Date(t.date);
-  return d >= cycle.start;
-}).reduce((s,t)=>s+t.amount,0);
-const outstanding = totalCycleSpend - totalPaidThisCycle;
-const nextCycleTotal = nextCycleSpends.reduce((s,t)=>s+t.amount,0);
+    const cycleSpends = allSpends.filter(t => {
+      const d = new Date(t.date);
+      return d >= cycle.start && d <= cycle.end;
+    });
+    const outstanding = cycleSpends.reduce((s,t)=>s+t.amount,0);
     const cycleLabel = fmtCycleDate(cycle.start) + ' – ' + fmtCycleDate(cycle.end);
     return `<div class="cc-card ${card.key}">
-  <div class="cc-card-name">${card.label}</div>
-  <div class="cc-card-bal">${fmt(outstanding)}</div>
-  <div class="cc-note">Current bill</div>
-  <div style="font-size:10px;margin-top:6px;color:var(--muted);">
-    ${fmtCycleDate(cycle.start)} – ${fmtCycleDate(cycle.end)}
-  </div>
-  <div style="font-size:10px;margin-top:6px;">
-    <span style="color:var(--orange);">${fmt(nextCycleTotal)}</span> next cycle
-  </div>
-  <div style="font-size:10px;margin-top:4px;">
-    <span style="color:var(--green);">${fmt(totalPaidThisCycle)}</span> paid
-  </div>
-</div>`;
       <div class="cc-card-name">${card.label}</div>
       <div class="cc-card-bal">${fmt(outstanding)}</div>
       <div class="cc-card-paid" style="color:var(--muted); font-size:10px; margin-top:4px;">
