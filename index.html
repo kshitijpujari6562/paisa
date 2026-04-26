@@ -193,24 +193,6 @@
     .emi-footer-txt { font-size:10px; color:var(--muted); }
     .emi-mark-btn { padding:5px 12px; background:rgba(52,211,153,0.1); border:0.5px solid rgba(52,211,153,0.3); border-radius:8px; color:var(--green); font-size:11px; font-weight:600; cursor:pointer; font-family:var(--font); }
     .emi-del-btn { background:none; border:none; color:var(--muted); font-size:13px; cursor:pointer; padding:4px 6px; }
-
-    .filter-scroll { display:flex; gap:6px; overflow-x:auto; padding:0 20px; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
-    .filter-scroll::-webkit-scrollbar { display:none; }
-    .filter-scroll .filter-chip { flex-shrink:0; }
-
-    .cc-detail-card { margin:0 20px 16px; background:var(--surface); border-radius:16px; overflow:hidden; border:0.5px solid var(--border); }
-    .cc-detail-header { padding:16px; display:flex; justify-content:space-between; align-items:center; border-bottom:0.5px solid var(--border); }
-    .cc-detail-name { font-size:14px; font-weight:700; }
-    .cc-detail-cycle { font-size:10px; color:var(--muted); margin-top:2px; letter-spacing:0.5px; }
-    .cc-detail-body { display:grid; grid-template-columns:1fr 1fr; }
-    .cc-detail-cell { padding:14px 16px; }
-    .cc-detail-cell:first-child { border-right:0.5px solid var(--border); }
-    .cc-detail-cell-label { font-size:10px; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:5px; }
-    .cc-detail-cell-amt { font-size:20px; font-weight:800; font-family:var(--mono); }
-    .cc-detail-cell-sub { font-size:10px; color:var(--muted); margin-top:3px; }
-    .cc-detail-txns { border-top:0.5px solid var(--border); }
-    .cc-detail-txn-header { padding:10px 16px; font-size:10px; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; background:var(--surface2); }
-    .cc-detail-empty { padding:16px; text-align:center; color:var(--muted); font-size:13px; }
   </style>
 </head>
 <body>
@@ -288,7 +270,7 @@
     </div>
 
     <div style="padding:0 20px 16px;">
-      <div onclick="switchNav('txns', document.querySelectorAll('.nav-item')[3])" style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:0.5px solid var(--border2);border-radius:14px;padding:16px;cursor:pointer;">
+      <div onclick="switchNav('txns', document.querySelectorAll('.nav-item')[2])" style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:0.5px solid var(--border2);border-radius:14px;padding:16px;cursor:pointer;">
         <span style="font-size:13px;font-weight:600;">View All Transactions</span>
         <span style="color:var(--accent2);font-size:18px;">→</span>
       </div>
@@ -420,39 +402,18 @@
     <div class="txn-section">
       <div class="section-header">
         <div class="section-title">All Transactions</div>
+        <div class="filter-row">
+          <div class="filter-chip active" onclick="setFilter('all',this)">All</div>
+          <div class="filter-chip" onclick="setFilter('gpay',this)">GPay</div>
+          <div class="filter-chip" onclick="setFilter('cc',this)">Cards</div>
+          <div class="filter-chip" onclick="setFilter('cred',this)">CRED</div>
+          <div class="filter-chip" onclick="setFilter('income',this)">Income</div>
+        </div>
       </div>
-      <!-- Filter chips — scrollable row -->
-      <div class="filter-scroll">
-        <div class="filter-chip active" onclick="setFilter('all',this)">All</div>
-        <div class="filter-chip" onclick="setFilter('gpay',this)">GPay UPI</div>
-        <div class="filter-chip" onclick="setFilter('cc_icici',this)">ICICI Card</div>
-        <div class="filter-chip" onclick="setFilter('cc_axis',this)">Axis Card</div>
-        <div class="filter-chip" onclick="setFilter('cc_kotak',this)">Kotak Card</div>
-        <div class="filter-chip" onclick="setFilter('cc_amazon',this)">Amazon Card</div>
-        <div class="filter-chip" onclick="setFilter('cred_icici',this)">CRED ICICI</div>
-        <div class="filter-chip" onclick="setFilter('cred_axis',this)">CRED Axis</div>
-        <div class="filter-chip" onclick="setFilter('cred_kotak',this)">CRED Kotak</div>
-        <div class="filter-chip" onclick="setFilter('cred_amazon',this)">CRED Amazon</div>
-        <div class="filter-chip" onclick="setFilter('expense',this)">Expenses</div>
-        <div class="filter-chip" onclick="setFilter('rent',this)">Rent</div>
-        <div class="filter-chip" onclick="setFilter('utilities',this)">Utilities</div>
-        <div class="filter-chip" onclick="setFilter('sip',this)">SIP</div>
-        <div class="filter-chip" onclick="setFilter('income',this)">Income</div>
-      </div>
-      <div style="height:14px;"></div>
       <div class="txn-list" id="fullList">
         <div class="empty-state">No transactions yet.</div>
       </div>
     </div>
-  </div>
-
-  <!-- CARDS -->
-  <div class="section" id="sec-cards">
-    <div style="padding:0 20px 10px;">
-      <div style="font-size:22px;font-weight:800;margin-bottom:4px;">Credit Cards</div>
-      <div style="font-size:11px;color:var(--muted);">Billing cycles & spend tracking</div>
-    </div>
-    <div id="ccDetailSection"></div>
   </div>
 
   <!-- ANALYTICS -->
@@ -483,7 +444,6 @@
   <div class="bottom-nav">
     <div class="nav-item active" onclick="switchNav('home',this)"><div class="nav-icon">⊞</div><span>Home</span></div>
     <div class="nav-item" onclick="switchNav('add',this)"><div class="nav-icon">＋</div><span>Add</span></div>
-    <div class="nav-item" onclick="switchNav('cards',this)"><div class="nav-icon">▣</div><span>Cards</span></div>
     <div class="nav-item" onclick="switchNav('txns',this)"><div class="nav-icon">≡</div><span>History</span></div>
     <div class="nav-item" onclick="switchNav('analytics',this)"><div class="nav-icon">◎</div><span>Analytics</span></div>
   </div>
@@ -611,9 +571,11 @@ function setFilter(f, el) {
 
 function filterMatch(t) {
   if (activeFilter === 'all') return true;
+  if (activeFilter === 'gpay') return t.category === 'gpay';
+  if (activeFilter === 'cc') return isCCSpend(t.category);
+  if (activeFilter === 'cred') return isCredPay(t.category);
   if (activeFilter === 'income') return isIncome(t.category);
-  // exact category match for everything else
-  return t.category === activeFilter;
+  return true;
 }
 
 function iconClass(t) {
@@ -721,60 +683,6 @@ function renderEMIs() {
     </div>`;
   }).join('');
 }
-function renderCards() {
-  const el = document.getElementById('ccDetailSection');
-  if (!el) return;
-  const cardColors = { icici:'var(--orange)', axis:'var(--red)', kotak:'var(--amber)', amazon:'var(--blue)' };
-
-  el.innerHTML = CC_CARDS.map(card => {
-    const currentCycle = getCurrentCycle(card.cycleDay);
-    const prevCycleStart = new Date(currentCycle.start);
-    prevCycleStart.setMonth(prevCycleStart.getMonth() - 1);
-    const prevCycleEnd = new Date(currentCycle.start);
-    prevCycleEnd.setDate(prevCycleEnd.getDate() - 1);
-    prevCycleEnd.setHours(23,59,59);
-    const allSpends = transactions.filter(t=>t.category===card.spendCat&&t.type==='dr');
-    const allPaid   = transactions.filter(t=>t.category===card.credCat&&t.type==='dr');
-    const currentSpends = allSpends.filter(t=>{ const d=new Date(t.date); return d>=currentCycle.start&&d<=currentCycle.end; });
-    const currentTotal  = currentSpends.reduce((s,t)=>s+t.amount,0);
-    const prevSpends = allSpends.filter(t=>{ const d=new Date(t.date); return d>=prevCycleStart&&d<=prevCycleEnd; });
-    const prevTotal  = prevSpends.reduce((s,t)=>s+t.amount,0);
-    const totalPaid = allPaid.reduce((s,t)=>s+t.amount,0);
-    const color = cardColors[card.key] || 'var(--accent)';
-    const currentLabel = fmtCycleDate(currentCycle.start) + ' – ' + fmtCycleDate(currentCycle.end);
-    const prevLabel    = fmtCycleDate(prevCycleStart) + ' – ' + fmtCycleDate(prevCycleEnd);
-    const recentSpends = allSpends.slice(0, 5);
-    return `<div class="cc-detail-card">
-      <div class="cc-detail-header">
-        <div>
-          <div class="cc-detail-name" style="color:${color};">${card.label}</div>
-          <div class="cc-detail-cycle">Cycle: ${card.cycleDay}th of each month</div>
-        </div>
-        <div style="text-align:right;">
-          <div style="font-size:10px;color:var(--muted);margin-bottom:2px;">Paid to date</div>
-          <div style="font-size:14px;font-weight:700;font-family:var(--mono);color:var(--green);">${fmt(totalPaid)}</div>
-        </div>
-      </div>
-      <div class="cc-detail-body">
-        <div class="cc-detail-cell">
-          <div class="cc-detail-cell-label">Previous Bill</div>
-          <div class="cc-detail-cell-amt" style="color:${color};">${fmt(prevTotal)}</div>
-          <div class="cc-detail-cell-sub">${prevLabel}</div>
-        </div>
-        <div class="cc-detail-cell">
-          <div class="cc-detail-cell-label">This Cycle</div>
-          <div class="cc-detail-cell-amt" style="color:var(--muted);">${fmt(currentTotal)}</div>
-          <div class="cc-detail-cell-sub">${currentLabel}</div>
-        </div>
-      </div>
-      <div class="cc-detail-txns">
-        <div class="cc-detail-txn-header">Recent Spends</div>
-        ${recentSpends.length ? recentSpends.map(t=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:11px 16px;border-bottom:0.5px solid var(--border);"><div><div style="font-size:13px;font-weight:600;">${t.merchant}</div><div style="font-size:10px;color:var(--muted);">${t.date}</div></div><span style="font-family:var(--mono);font-weight:700;color:var(--red);">−${fmt(t.amount)}</span></div>`).join(''') : '<div class="cc-detail-empty">No spends yet.</div>'}
-      </div>
-    </div>`;
-  }).join(');
-}
-
 
 function renderAnalyticsEMI() {
   const el = document.getElementById('analyticsEMI');
@@ -939,7 +847,6 @@ function render() {
   document.getElementById('breakdown').innerHTML = rows || '<div class="empty-state">No data yet.</div>';
 
   renderAnalyticsEMI();
-  renderCards();
 }
 
 function switchNav(section, el) {
