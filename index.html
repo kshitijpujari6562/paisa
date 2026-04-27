@@ -17,19 +17,22 @@
       --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
       --text: #f0f0f8; --muted: #8888aa;
       --accent: #7c6af7; --accent2: #a594ff;
-      --green: #34d399; --red: #f87171; --amber: #fbbf24; --pink: #f472b6; --teal: #2dd4bf; --blue: #60a5fa; --orange: #fb923c;
+      --green: #34d399; --red: #f87171; --amber: #fbbf24; --pink: #f472b6;
+      --teal: #2dd4bf; --blue: #60a5fa; --orange: #fb923c;
       --font: 'Syne', sans-serif; --mono: 'JetBrains Mono', monospace;
       --safe-top: env(safe-area-inset-top, 0px); --safe-bottom: env(safe-area-inset-bottom, 0px);
     }
     html, body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100dvh; overflow-x: hidden; }
     .app { max-width: 430px; margin: 0 auto; padding-top: calc(var(--safe-top) + 16px); padding-bottom: calc(var(--safe-bottom) + 80px); min-height: 100dvh; }
 
+    /* Header */
     .header { padding: 0 20px; }
     .header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
     .greeting { font-size: 11px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
     .user-name { font-size: 22px; font-weight: 800; }
     .month-badge { background: var(--surface2); border: 0.5px solid var(--border2); border-radius: 20px; padding: 6px 14px; font-size: 12px; color: var(--muted); font-weight: 500; }
 
+    /* Balance */
     .balance-card { margin: 0 20px 16px; background: linear-gradient(135deg,#1e1b4b,#312e81,#1e1b4b); border-radius: 20px; padding: 22px; position: relative; overflow: hidden; border: 0.5px solid rgba(124,106,247,0.3); }
     .balance-card::before { content:''; position:absolute; top:-30px; right:-30px; width:120px; height:120px; border-radius:50%; background:rgba(124,106,247,0.15); }
     .balance-label { font-size: 11px; letter-spacing: 2px; color: rgba(165,148,255,0.7); text-transform: uppercase; margin-bottom: 6px; }
@@ -39,160 +42,181 @@
     .bal-item-val { font-size: 15px; font-weight: 700; font-family: var(--mono); }
     .bal-item-val.cr { color: var(--green); } .bal-item-val.dr { color: var(--red); }
 
+    /* CC Summary Cards (home) */
     .cc-cards-scroll { display: flex; gap: 10px; padding: 0 20px 16px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
     .cc-cards-scroll::-webkit-scrollbar { display: none; }
     .cc-card { min-width: 150px; background: var(--surface); border: 0.5px solid var(--border2); border-radius: 16px; padding: 14px; flex-shrink: 0; }
     .cc-card-name { font-size: 10px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
     .cc-card-bal { font-size: 17px; font-weight: 800; font-family: var(--mono); }
-    .cc-card-paid { font-size: 10px; margin-top: 4px; }
+    .cc-card-sub { font-size: 10px; color: var(--muted); margin-top: 4px; }
     .cc-card.icici { border-color: rgba(251,146,60,0.3); } .cc-card.icici .cc-card-bal { color: var(--orange); }
-    .cc-card.axis { border-color: rgba(248,113,113,0.3); } .cc-card.axis .cc-card-bal { color: var(--red); }
+    .cc-card.axis  { border-color: rgba(248,113,113,0.3); } .cc-card.axis  .cc-card-bal { color: var(--red); }
     .cc-card.kotak { border-color: rgba(251,191,36,0.3); } .cc-card.kotak .cc-card-bal { color: var(--amber); }
-    .cc-card.amazon { border-color: rgba(96,165,250,0.3); } .cc-card.amazon .cc-card-bal { color: var(--blue); }
+    .cc-card.amazon{ border-color: rgba(96,165,250,0.3);  } .cc-card.amazon.cc-card-bal { color: var(--blue); }
 
+    /* Stats */
     .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 20px; margin-bottom: 16px; }
     .stat-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: 14px; padding: 14px; }
     .stat-label { font-size: 10px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 4px; }
     .stat-val { font-size: 17px; font-weight: 700; font-family: var(--mono); }
-    .stat-val.gpay { color: var(--teal); } .stat-val.cred { color: var(--amber); } .stat-val.cc { color: var(--pink); } .stat-val.daily { color: var(--accent2); }
+    .stat-val.gpay { color: var(--teal); } .stat-val.cred { color: var(--amber); }
+    .stat-val.cc { color: var(--pink); } .stat-val.daily { color: var(--accent2); }
 
-    textarea { width:100%; background:var(--surface); border:0.5px solid var(--border2); border-radius:14px; padding:14px; color:var(--text); font-size:13px; font-family:var(--mono); resize:none; height:100px; outline:none; -webkit-appearance:none; }
-    textarea:focus { border-color: var(--accent); }
-    textarea::placeholder { color: var(--muted); font-size: 12px; }
+    /* Forms */
+    .manual-form { margin: 0 20px 16px; background: var(--surface); border: 0.5px solid var(--border); border-radius: 16px; padding: 16px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group label { font-size: 10px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; }
+    .form-group input, .form-group select { background: var(--surface2); border: 0.5px solid var(--border2); border-radius: 10px; padding: 11px 12px; color: var(--text); font-size: 13px; font-family: var(--mono); outline: none; -webkit-appearance: none; appearance: none; width: 100%; }
+    .form-group input:focus, .form-group select:focus { border-color: var(--accent); }
+    .form-group select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238888aa' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-color: var(--surface2); padding-right: 32px; }
+    .form-full { grid-column: 1/-1; }
+    .type-toggle { display: flex; gap: 6px; }
+    .type-btn { flex: 1; padding: 10px 4px; border-radius: 9px; border: 0.5px solid var(--border); background: var(--surface2); color: var(--muted); font-size: 11px; font-weight: 600; cursor: pointer; font-family: var(--font); text-align: center; }
+    .type-btn.dr.active { background: rgba(248,113,113,0.15); border-color: var(--red); color: var(--red); }
+    .type-btn.cr.active { background: rgba(52,211,153,0.15); border-color: var(--green); color: var(--green); }
+    .add-manual-btn { width: 100%; padding: 13px; background: var(--surface2); border: 0.5px solid var(--accent); border-radius: 12px; color: var(--accent2); font-size: 13px; font-weight: 700; font-family: var(--font); cursor: pointer; margin-top: 4px; }
 
-    .manual-form { margin:0 20px 16px; background:var(--surface); border:0.5px solid var(--border); border-radius:16px; padding:16px; }
-    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px; }
-    .form-group { display:flex; flex-direction:column; gap:5px; }
-    .form-group label { font-size:10px; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; }
-    .form-group input, .form-group select { background:var(--surface2); border:0.5px solid var(--border2); border-radius:10px; padding:11px 12px; color:var(--text); font-size:13px; font-family:var(--mono); outline:none; -webkit-appearance:none; appearance:none; width:100%; }
-    .form-group input:focus, .form-group select:focus { border-color:var(--accent); }
-    .form-group select { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238888aa' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; background-color:var(--surface2); padding-right:32px; }
-    .form-full { grid-column:1/-1; }
-    .type-toggle { display:flex; gap:6px; }
-    .type-btn { flex:1; padding:10px 4px; border-radius:9px; border:0.5px solid var(--border); background:var(--surface2); color:var(--muted); font-size:11px; font-weight:600; cursor:pointer; font-family:var(--font); text-align:center; }
-    .type-btn.dr.active { background:rgba(248,113,113,0.15); border-color:var(--red); color:var(--red); }
-    .type-btn.cr.active { background:rgba(52,211,153,0.15); border-color:var(--green); color:var(--green); }
-    .add-manual-btn { width:100%; padding:13px; background:var(--surface2); border:0.5px solid var(--accent); border-radius:12px; color:var(--accent2); font-size:13px; font-weight:700; font-family:var(--font); cursor:pointer; margin-top:4px; }
-
+    /* Transactions */
     .txn-section { padding: 0 20px; }
-    .section-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px; }
-    .section-title { font-size:13px; font-weight:700; letter-spacing:0.5px; }
-    .filter-row { display:flex; gap:6px; flex-wrap:wrap; }
-    .filter-chip { padding:5px 11px; border-radius:20px; border:0.5px solid var(--border); background:var(--surface); color:var(--muted); font-size:11px; cursor:pointer; font-family:var(--font); }
-    .filter-chip.active { border-color:var(--accent); color:var(--accent2); background:rgba(124,106,247,0.1); }
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
+    .section-title { font-size: 13px; font-weight: 700; letter-spacing: 0.5px; }
+    .filter-scroll { display: flex; gap: 6px; overflow-x: auto; padding: 0 20px; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: 2px; }
+    .filter-scroll::-webkit-scrollbar { display: none; }
+    .filter-chip { padding: 5px 11px; border-radius: 20px; border: 0.5px solid var(--border); background: var(--surface); color: var(--muted); font-size: 11px; cursor: pointer; font-family: var(--font); flex-shrink: 0; white-space: nowrap; }
+    .filter-chip.active { border-color: var(--accent); color: var(--accent2); background: rgba(124,106,247,0.1); }
+    .txn-list { display: flex; flex-direction: column; gap: 8px; }
+    .txn-item { background: var(--surface); border: 0.5px solid var(--border); border-radius: 14px; padding: 13px 14px; display: flex; align-items: center; gap: 10px; }
+    .txn-icon { width: 36px; height: 36px; border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+    .txn-icon.gpay { background: rgba(45,212,191,0.12); }
+    .txn-icon.cred_icici,.txn-icon.cred_axis,.txn-icon.cred_kotak,.txn-icon.cred_amazon { background: rgba(251,191,36,0.12); }
+    .txn-icon.cc_icici { background: rgba(251,146,60,0.12); }
+    .txn-icon.cc_axis  { background: rgba(248,113,113,0.12); }
+    .txn-icon.cc_kotak { background: rgba(251,191,36,0.12); }
+    .txn-icon.cc_amazon{ background: rgba(96,165,250,0.12); }
+    .txn-icon.expense  { background: rgba(124,106,247,0.12); }
+    .txn-icon.salary,.txn-icon.freelance { background: rgba(52,211,153,0.12); }
+    .txn-icon.rent     { background: rgba(248,113,113,0.12); }
+    .txn-icon.sip      { background: rgba(96,165,250,0.12); }
+    .txn-icon.utilities{ background: rgba(96,165,250,0.12); }
+    .txn-info { flex: 1; min-width: 0; }
+    .txn-merchant { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .txn-meta { font-size: 11px; color: var(--muted); margin-top: 2px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+    .txn-tag { padding: 2px 7px; border-radius: 20px; font-size: 10px; font-weight: 600; }
+    .tag-gpay { background: rgba(45,212,191,0.12); color: var(--teal); }
+    .tag-cred_icici,.tag-cred_axis,.tag-cred_kotak,.tag-cred_amazon { background: rgba(251,191,36,0.12); color: var(--amber); }
+    .tag-cc_icici { background: rgba(251,146,60,0.12); color: var(--orange); }
+    .tag-cc_axis  { background: rgba(248,113,113,0.12); color: var(--red); }
+    .tag-cc_kotak { background: rgba(251,191,36,0.12); color: var(--amber); }
+    .tag-cc_amazon{ background: rgba(96,165,250,0.12); color: var(--blue); }
+    .tag-expense  { background: rgba(124,106,247,0.12); color: var(--accent2); }
+    .tag-salary,.tag-freelance { background: rgba(52,211,153,0.12); color: var(--green); }
+    .tag-rent     { background: rgba(248,113,113,0.12); color: var(--red); }
+    .tag-sip      { background: rgba(96,165,250,0.12); color: var(--blue); }
+    .tag-utilities{ background: rgba(96,165,250,0.12); color: var(--blue); }
+    .txn-amount { font-family: var(--mono); font-size: 14px; font-weight: 700; flex-shrink: 0; }
+    .txn-amount.dr { color: var(--red); } .txn-amount.cr { color: var(--green); }
+    .del-btn { background: none; border: none; color: var(--muted); font-size: 13px; cursor: pointer; padding: 4px 6px; border-radius: 6px; flex-shrink: 0; }
 
-    .txn-list { display:flex; flex-direction:column; gap:8px; }
-    .txn-item { background:var(--surface); border:0.5px solid var(--border); border-radius:14px; padding:13px 14px; display:flex; align-items:center; gap:10px; }
-    .txn-icon { width:36px; height:36px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; }
-    .txn-icon.gpay { background:rgba(45,212,191,0.12); }
-    .txn-icon.cred_icici,.txn-icon.cred_axis,.txn-icon.cred_kotak,.txn-icon.cred_amazon,.txn-icon.cred { background:rgba(251,191,36,0.12); }
-    .txn-icon.cc_icici { background:rgba(251,146,60,0.12); }
-    .txn-icon.cc_axis { background:rgba(248,113,113,0.12); }
-    .txn-icon.cc_kotak { background:rgba(251,191,36,0.12); }
-    .txn-icon.cc_amazon { background:rgba(96,165,250,0.12); }
-    .txn-icon.expense { background:rgba(124,106,247,0.12); }
-    .txn-icon.salary,.txn-icon.freelance { background:rgba(52,211,153,0.12); }
-    .txn-icon.rent { background:rgba(248,113,113,0.12); }
-    .txn-icon.sip { background:rgba(96,165,250,0.12); }
-    .txn-icon.utilities { background:rgba(96,165,250,0.12); }
-    .txn-info { flex:1; min-width:0; }
-    .txn-merchant { font-size:13px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .txn-meta { font-size:11px; color:var(--muted); margin-top:2px; display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
-    .txn-tag { padding:2px 7px; border-radius:20px; font-size:10px; font-weight:600; }
-    .tag-gpay { background:rgba(45,212,191,0.12); color:var(--teal); }
-    .tag-cred,.tag-cred_icici,.tag-cred_axis,.tag-cred_kotak,.tag-cred_amazon { background:rgba(251,191,36,0.12); color:var(--amber); }
-    .tag-cc_icici { background:rgba(251,146,60,0.12); color:var(--orange); }
-    .tag-cc_axis { background:rgba(248,113,113,0.12); color:var(--red); }
-    .tag-cc_kotak { background:rgba(251,191,36,0.12); color:var(--amber); }
-    .tag-cc_amazon { background:rgba(96,165,250,0.12); color:var(--blue); }
-    .tag-expense { background:rgba(124,106,247,0.12); color:var(--accent2); }
-    .tag-salary,.tag-freelance { background:rgba(52,211,153,0.12); color:var(--green); }
-    .tag-rent { background:rgba(248,113,113,0.12); color:var(--red); }
-    .tag-sip { background:rgba(96,165,250,0.12); color:var(--blue); }
-    .tag-utilities { background:rgba(96,165,250,0.12); color:var(--blue); }
-    .txn-amount { font-family:var(--mono); font-size:14px; font-weight:700; flex-shrink:0; }
-    .txn-amount.dr { color:var(--red); } .txn-amount.cr { color:var(--green); }
-    .del-btn { background:none; border:none; color:var(--muted); font-size:13px; cursor:pointer; padding:4px 6px; border-radius:6px; flex-shrink:0; }
+    .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 14px; line-height: 1.7; }
+    .section-sep { font-size: 10px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; padding: 0 20px; margin-bottom: 10px; }
+    .cc-note { font-size: 11px; color: var(--teal); margin-top: 3px; }
 
-    .empty-state { text-align:center; padding:40px 20px; color:var(--muted); font-size:14px; line-height:1.7; }
-    .section-sep { font-size:10px; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; padding:0 20px; margin-bottom:10px; }
+    /* Savings */
+    .savings-alert { margin: 0 20px 16px; border-radius: 16px; padding: 16px; border: 0.5px solid; display: block; }
+    .savings-alert.safe { background: rgba(52,211,153,0.08); border-color: rgba(52,211,153,0.25); }
+    .savings-alert.warn { background: rgba(251,191,36,0.08); border-color: rgba(251,191,36,0.3); }
+    .savings-alert.danger { background: rgba(248,113,113,0.08); border-color: rgba(248,113,113,0.3); }
+    .alert-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .alert-label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; }
+    .alert-label.safe { color: var(--green); } .alert-label.warn { color: var(--amber); } .alert-label.danger { color: var(--red); }
+    .alert-val { font-size: 13px; font-weight: 700; font-family: var(--mono); }
+    .progress-track { background: rgba(255,255,255,0.06); border-radius: 10px; height: 6px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 10px; transition: width 0.6s ease; }
+    .progress-fill.safe { background: var(--green); } .progress-fill.warn { background: var(--amber); } .progress-fill.danger { background: var(--red); }
+    .alert-sub { font-size: 11px; color: var(--muted); margin-top: 8px; }
 
-    .cred-points { background:var(--surface2); border:0.5px solid rgba(251,191,36,0.2); border-radius:14px; padding:14px 16px; margin-bottom:12px; display:flex; align-items:center; gap:12px; }
-    .cred-pts-icon { width:36px; height:36px; background:rgba(251,191,36,0.1); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:16px; }
-    .cred-pts-label { font-size:10px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; margin-bottom:2px; }
-    .cred-pts-val { font-size:20px; font-weight:800; color:var(--amber); font-family:var(--mono); }
+    /* Food */
+    .food-section { padding: 0 20px; margin-bottom: 16px; }
+    .food-row-label { font-size: 11px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; }
+    .food-cards { display: flex; gap: 10px; }
+    .food-card { flex: 1; background: var(--surface); border: 0.5px solid var(--border); border-radius: 14px; padding: 13px; text-align: center; }
+    .food-card-icon { font-size: 20px; margin-bottom: 5px; }
+    .food-card-name { font-size: 9px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+    .food-card-amt { font-size: 15px; font-weight: 800; font-family: var(--mono); color: var(--red); }
+    .food-card-count { font-size: 10px; color: var(--muted); margin-top: 2px; }
 
-    .chart-bar-wrap { padding:0 20px 16px; }
-    .chart-title { font-size:11px; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:12px; }
-    .bars { display:flex; gap:6px; align-items:flex-end; height:90px; }
-    .bar-col { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; }
-    .bar { width:100%; border-radius:5px 5px 0 0; transition:height 0.5s ease; min-height:3px; }
-    .bar-lbl { font-size:8px; color:var(--muted); letter-spacing:0.3px; text-align:center; }
-    .bar-val { font-size:8px; color:var(--muted); font-family:var(--mono); }
+    /* SIP card */
+    .sip-card { margin: 0 20px 16px; background: var(--surface); border: 0.5px solid rgba(96,165,250,0.3); border-radius: 16px; padding: 18px; display: flex; align-items: center; justify-content: space-between; }
+    .sip-card-icon { width: 40px; height: 40px; background: rgba(96,165,250,0.12); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+    .sip-card-label { font-size: 10px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 4px; }
+    .sip-card-amt { font-size: 22px; font-weight: 800; font-family: var(--mono); color: var(--blue); }
+    .sip-card-count { font-size: 11px; color: var(--muted); margin-top: 2px; }
 
-    .bottom-nav { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:430px; background:rgba(17,17,24,0.95); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-top:0.5px solid var(--border2); padding:10px 20px; padding-bottom:calc(10px + var(--safe-bottom)); display:flex; justify-content:space-around; z-index:100; }
-    .nav-item { display:flex; flex-direction:column; align-items:center; gap:4px; color:var(--muted); font-size:9px; letter-spacing:1px; text-transform:uppercase; cursor:pointer; padding:6px 14px; border-radius:12px; transition:all 0.2s; }
-    .nav-item.active { color:var(--accent2); background:rgba(124,106,247,0.1); }
-    .nav-icon { font-size:18px; }
+    /* CRED */
+    .cred-points { background: var(--surface2); border: 0.5px solid rgba(251,191,36,0.2); border-radius: 14px; padding: 14px 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; }
+    .cred-pts-icon { width: 36px; height: 36px; background: rgba(251,191,36,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+    .cred-pts-label { font-size: 10px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 2px; }
+    .cred-pts-val { font-size: 20px; font-weight: 800; color: var(--amber); font-family: var(--mono); }
 
-    .section { display:none; } .section.active { display:block; }
+    /* Charts */
+    .chart-bar-wrap { padding: 0 20px 16px; }
+    .chart-title { font-size: 11px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 12px; }
+    .bars { display: flex; gap: 6px; align-items: flex-end; height: 90px; }
+    .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+    .bar { width: 100%; border-radius: 5px 5px 0 0; transition: height 0.5s ease; min-height: 3px; }
+    .bar-lbl { font-size: 8px; color: var(--muted); letter-spacing: 0.3px; text-align: center; }
+    .bar-val  { font-size: 8px; color: var(--muted); font-family: var(--mono); }
 
-    .toast { position:fixed; top:calc(var(--safe-top) + 16px); left:50%; transform:translateX(-50%) translateY(-80px); background:var(--green); color:#052e16; font-weight:700; font-size:13px; font-family:var(--font); padding:12px 24px; border-radius:20px; z-index:999; transition:transform 0.3s ease; white-space:nowrap; }
-    .toast.show { transform:translateX(-50%) translateY(0); }
+    /* Nav */
+    .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: rgba(17,17,24,0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 0.5px solid var(--border2); padding: 10px 8px; padding-bottom: calc(10px + var(--safe-bottom)); display: flex; justify-content: space-around; z-index: 100; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--muted); font-size: 8px; letter-spacing: 0.8px; text-transform: uppercase; cursor: pointer; padding: 6px 10px; border-radius: 12px; transition: all 0.2s; }
+    .nav-item.active { color: var(--accent2); background: rgba(124,106,247,0.1); }
+    .nav-icon { font-size: 16px; }
 
-    .cc-note { font-size:11px; color:var(--teal); margin-top:3px; }
+    .section { display: none; } .section.active { display: block; }
+    .toast { position: fixed; top: calc(var(--safe-top) + 16px); left: 50%; transform: translateX(-50%) translateY(-80px); background: var(--green); color: #052e16; font-weight: 700; font-size: 13px; font-family: var(--font); padding: 12px 24px; border-radius: 20px; z-index: 999; transition: transform 0.3s ease; white-space: nowrap; }
+    .toast.show { transform: translateX(-50%) translateY(0); }
 
-    .savings-alert { margin:0 20px 16px; border-radius:16px; padding:16px; border:0.5px solid; display:block; }
-    .savings-alert.hidden { display:none; }
-    .savings-alert.safe { background:rgba(52,211,153,0.08); border-color:rgba(52,211,153,0.25); }
-    .savings-alert.warn { background:rgba(251,191,36,0.08); border-color:rgba(251,191,36,0.3); }
-    .savings-alert.danger { background:rgba(248,113,113,0.08); border-color:rgba(248,113,113,0.3); }
-    .alert-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
-    .alert-label { font-size:10px; letter-spacing:1.5px; text-transform:uppercase; }
-    .alert-label.safe { color:var(--green); } .alert-label.warn { color:var(--amber); } .alert-label.danger { color:var(--red); }
-    .alert-val { font-size:13px; font-weight:700; font-family:var(--mono); }
-    .progress-track { background:rgba(255,255,255,0.06); border-radius:10px; height:6px; overflow:hidden; }
-    .progress-fill { height:100%; border-radius:10px; transition:width 0.6s ease; }
-    .progress-fill.safe { background:var(--green); } .progress-fill.warn { background:var(--amber); } .progress-fill.danger { background:var(--red); }
-    .alert-sub { font-size:11px; color:var(--muted); margin-top:8px; }
-
-    .food-section { padding:0 20px; margin-bottom:16px; }
-    .food-row-label { font-size:11px; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:10px; }
-    .food-cards { display:flex; gap:10px; }
-    .food-card { flex:1; background:var(--surface); border:0.5px solid var(--border); border-radius:14px; padding:13px; text-align:center; }
-    .food-card-icon { font-size:20px; margin-bottom:5px; }
-    .food-card-name { font-size:9px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; margin-bottom:4px; }
-    .food-card-amt { font-size:15px; font-weight:800; font-family:var(--mono); color:var(--red); }
-    .food-card-count { font-size:10px; color:var(--muted); margin-top:2px; }
-
-    .sip-card { margin:0 20px 16px; background:var(--surface); border:0.5px solid rgba(96,165,250,0.3); border-radius:16px; padding:18px; display:flex; align-items:center; justify-content:space-between; }
-    .sip-card-left { display:flex; align-items:center; gap:12px; }
-    .sip-card-icon { width:40px; height:40px; background:rgba(96,165,250,0.12); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
-    .sip-card-label { font-size:10px; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:4px; }
-    .sip-card-amt { font-size:22px; font-weight:800; font-family:var(--mono); color:var(--blue); }
-    .sip-card-count { font-size:11px; color:var(--muted); margin-top:2px; }
+    /* Add tab toggle */
+    .add-type-toggle { display: flex; gap: 8px; padding: 0 20px 14px; }
+    .add-type-btn { flex: 1; padding: 10px; border-radius: 12px; border: 0.5px solid var(--border); background: var(--surface); color: var(--muted); font-size: 12px; font-weight: 600; cursor: pointer; font-family: var(--font); text-align: center; }
+    .add-type-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 
     /* EMI */
-    .add-type-toggle { display:flex; gap:8px; padding:0 20px 14px; }
-    .add-type-btn { flex:1; padding:10px; border-radius:12px; border:0.5px solid var(--border); background:var(--surface); color:var(--muted); font-size:12px; font-weight:600; cursor:pointer; font-family:var(--font); text-align:center; }
-    .add-type-btn.active { background:var(--accent); border-color:var(--accent); color:#fff; }
-    .emi-form { margin:0 20px 16px; background:var(--surface); border:0.5px solid rgba(96,165,250,0.25); border-radius:16px; padding:16px; }
-    .emi-preview { background:var(--surface2); border-radius:10px; padding:12px; margin-bottom:10px; font-size:13px; display:none; }
-    .add-emi-btn { width:100%; padding:13px; background:var(--surface2); border:0.5px solid var(--blue); border-radius:12px; color:var(--blue); font-size:13px; font-weight:700; font-family:var(--font); cursor:pointer; margin-top:4px; }
-    .emi-section-label { font-size:10px; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; padding:0 20px; margin-bottom:10px; }
-    .emi-list { display:flex; flex-direction:column; gap:10px; padding:0 20px 16px; }
-    .emi-item { background:var(--surface); border:0.5px solid var(--border); border-radius:14px; padding:14px; }
-    .emi-item-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; }
-    .emi-name { font-size:13px; font-weight:600; }
-    .emi-sub { font-size:10px; color:var(--muted); margin-top:2px; }
-    .emi-monthly { font-size:16px; font-weight:800; font-family:var(--mono); color:var(--blue); text-align:right; }
-    .emi-monthly-lbl { font-size:10px; color:var(--muted); text-align:right; }
-    .emi-track { background:rgba(255,255,255,0.06); border-radius:10px; height:4px; overflow:hidden; margin:8px 0; }
-    .emi-fill { height:100%; border-radius:10px; background:var(--blue); transition:width 0.5s; }
-    .emi-footer { display:flex; justify-content:space-between; align-items:center; }
-    .emi-footer-txt { font-size:10px; color:var(--muted); }
-    .emi-mark-btn { padding:5px 12px; background:rgba(52,211,153,0.1); border:0.5px solid rgba(52,211,153,0.3); border-radius:8px; color:var(--green); font-size:11px; font-weight:600; cursor:pointer; font-family:var(--font); }
-    .emi-del-btn { background:none; border:none; color:var(--muted); font-size:13px; cursor:pointer; padding:4px 6px; }
+    .emi-form { margin: 0 20px 16px; background: var(--surface); border: 0.5px solid rgba(96,165,250,0.25); border-radius: 16px; padding: 16px; }
+    .emi-preview { background: var(--surface2); border-radius: 10px; padding: 12px; margin-bottom: 10px; font-size: 13px; display: none; }
+    .add-emi-btn { width: 100%; padding: 13px; background: var(--surface2); border: 0.5px solid var(--blue); border-radius: 12px; color: var(--blue); font-size: 13px; font-weight: 700; font-family: var(--font); cursor: pointer; margin-top: 4px; }
+    .emi-section-label { font-size: 10px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; padding: 0 20px; margin-bottom: 10px; }
+    .emi-list { display: flex; flex-direction: column; gap: 10px; padding: 0 20px 16px; }
+    .emi-item { background: var(--surface); border: 0.5px solid var(--border); border-radius: 14px; padding: 14px; }
+    .emi-item-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+    .emi-name { font-size: 13px; font-weight: 600; }
+    .emi-sub  { font-size: 10px; color: var(--muted); margin-top: 2px; }
+    .emi-monthly { font-size: 16px; font-weight: 800; font-family: var(--mono); color: var(--blue); text-align: right; }
+    .emi-monthly-lbl { font-size: 10px; color: var(--muted); text-align: right; }
+    .emi-track { background: rgba(255,255,255,0.06); border-radius: 10px; height: 4px; overflow: hidden; margin: 8px 0; }
+    .emi-fill  { height: 100%; border-radius: 10px; background: var(--blue); transition: width 0.5s; }
+    .emi-footer { display: flex; justify-content: space-between; align-items: center; }
+    .emi-footer-txt { font-size: 10px; color: var(--muted); }
+    .emi-mark-btn { padding: 5px 12px; background: rgba(52,211,153,0.1); border: 0.5px solid rgba(52,211,153,0.3); border-radius: 8px; color: var(--green); font-size: 11px; font-weight: 600; cursor: pointer; font-family: var(--font); }
+    .emi-del-btn  { background: none; border: none; color: var(--muted); font-size: 13px; cursor: pointer; padding: 4px 6px; }
+
+    /* CC Detail Cards */
+    .cc-detail-card { margin: 0 20px 16px; background: var(--surface); border-radius: 16px; overflow: hidden; border: 0.5px solid var(--border); }
+    .cc-detail-header { padding: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 0.5px solid var(--border); }
+    .cc-detail-name  { font-size: 15px; font-weight: 700; }
+    .cc-detail-cycle { font-size: 10px; color: var(--muted); margin-top: 2px; }
+    .cc-detail-body  { display: grid; grid-template-columns: 1fr 1fr; }
+    .cc-detail-cell  { padding: 14px 16px; }
+    .cc-detail-cell:first-child { border-right: 0.5px solid var(--border); }
+    .cc-detail-cell-label { font-size: 10px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 5px; }
+    .cc-detail-cell-amt   { font-size: 20px; font-weight: 800; font-family: var(--mono); }
+    .cc-detail-cell-sub   { font-size: 10px; color: var(--muted); margin-top: 3px; }
+    .cc-detail-txns       { border-top: 0.5px solid var(--border); }
+    .cc-detail-txn-header { padding: 10px 16px; font-size: 10px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; background: var(--surface2); }
+    .cc-detail-txn-row    { display: flex; justify-content: space-between; align-items: center; padding: 11px 16px; border-bottom: 0.5px solid var(--border); }
+    .cc-detail-empty      { padding: 20px; text-align: center; color: var(--muted); font-size: 13px; }
   </style>
 </head>
 <body>
@@ -229,23 +253,24 @@
   <div class="stats-row">
     <div class="stat-card"><div class="stat-label">GPay UPI</div><div class="stat-val gpay" id="gpayTotal">₹0</div></div>
     <div class="stat-card"><div class="stat-label">CRED Paid</div><div class="stat-val cred" id="credTotal">₹0</div></div>
-    <div class="stat-card"><div class="stat-label">CC Spends</div><div class="stat-val cc" id="ccTotal">₹0</div></div>
+    <div class="stat-card"><div class="stat-label">CC Spends</div><div class="stat-val cc"   id="ccTotal">₹0</div></div>
     <div class="stat-card"><div class="stat-label">Daily Avg</div><div class="stat-val daily" id="dailyAvg">₹0</div></div>
   </div>
 
   <!-- HOME -->
   <div class="section active" id="sec-home">
+
     <div class="savings-alert" id="savingsAlert">
       <div class="alert-top">
         <span class="alert-label" id="alertLabel">Monthly Savings</span>
-        <span class="alert-val" id="alertVal">₹0 / ₹10,000</span>
+        <span class="alert-val"   id="alertVal">₹0 saved of ₹10,000 goal</span>
       </div>
       <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
       <div class="alert-sub" id="alertSub">Add income transactions to track savings.</div>
     </div>
 
     <div class="food-section" id="foodSection" style="display:none;">
-      <div class="food-row-label">Food & Delivery</div>
+      <div class="food-row-label">Food &amp; Delivery</div>
       <div class="food-cards">
         <div class="food-card"><div class="food-card-icon">🍊</div><div class="food-card-name">Swiggy</div><div class="food-card-amt" id="swiggyAmt">₹0</div><div class="food-card-count" id="swiggyCount">0 orders</div></div>
         <div class="food-card"><div class="food-card-icon">🍅</div><div class="food-card-name">Zomato</div><div class="food-card-amt" id="zomatoAmt">₹0</div><div class="food-card-count" id="zomatoCount">0 orders</div></div>
@@ -253,13 +278,12 @@
       </div>
     </div>
 
-    <!-- SIP Investment Card -->
     <div class="sip-card" id="sipCard" style="display:none;">
-      <div class="sip-card-left">
+      <div style="display:flex;align-items:center;gap:12px;">
         <div class="sip-card-icon">◑</div>
         <div>
           <div class="sip-card-label">SIP Invested</div>
-          <div class="sip-card-amt" id="sipTotal">₹0</div>
+          <div class="sip-card-amt"   id="sipTotal">₹0</div>
           <div class="sip-card-count" id="sipCount">0 instalments</div>
         </div>
       </div>
@@ -270,7 +294,7 @@
     </div>
 
     <div style="padding:0 20px 16px;">
-      <div onclick="switchNav('txns', document.querySelectorAll('.nav-item')[2])" style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:0.5px solid var(--border2);border-radius:14px;padding:16px;cursor:pointer;">
+      <div onclick="switchNav('txns', document.querySelectorAll('.nav-item')[3])" style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:0.5px solid var(--border2);border-radius:14px;padding:16px;cursor:pointer;">
         <span style="font-size:13px;font-weight:600;">View All Transactions</span>
         <span style="color:var(--accent2);font-size:18px;">→</span>
       </div>
@@ -280,13 +304,11 @@
   <!-- ADD -->
   <div class="section" id="sec-add">
     <div class="section-sep" style="padding-top:4px;">Add Transaction</div>
-
     <div class="add-type-toggle">
       <div class="add-type-btn active" id="tab-txn" onclick="switchAddTab('txn')">Transaction</div>
-      <div class="add-type-btn" id="tab-emi" onclick="switchAddTab('emi')">EMI</div>
+      <div class="add-type-btn"        id="tab-emi" onclick="switchAddTab('emi')">EMI</div>
     </div>
 
-    <!-- Transaction form — untouched -->
     <div id="form-txn">
       <div class="manual-form">
         <div class="form-row">
@@ -298,7 +320,7 @@
             <label>Type</label>
             <div class="type-toggle">
               <div class="type-btn dr active" id="btn-dr" onclick="setType('dr')">Debit</div>
-              <div class="type-btn cr" id="btn-cr" onclick="setType('cr')">Credit</div>
+              <div class="type-btn cr"        id="btn-cr" onclick="setType('cr')">Credit</div>
             </div>
           </div>
         </div>
@@ -351,7 +373,6 @@
       </div>
     </div>
 
-    <!-- EMI form -->
     <div id="form-emi" style="display:none;">
       <div class="emi-form">
         <div class="form-row">
@@ -397,19 +418,41 @@
     </div>
   </div>
 
+  <!-- CARDS -->
+  <div class="section" id="sec-cards">
+    <div style="padding:0 20px 16px;">
+      <div style="font-size:22px;font-weight:800;margin-bottom:4px;">Credit Cards</div>
+      <div style="font-size:11px;color:var(--muted);">Billing cycles &amp; spend tracking</div>
+    </div>
+    <div id="ccDetailSection"></div>
+  </div>
+
   <!-- HISTORY -->
   <div class="section" id="sec-txns">
     <div class="txn-section">
       <div class="section-header">
         <div class="section-title">All Transactions</div>
-        <div class="filter-row">
-          <div class="filter-chip active" onclick="setFilter('all',this)">All</div>
-          <div class="filter-chip" onclick="setFilter('gpay',this)">GPay</div>
-          <div class="filter-chip" onclick="setFilter('cc',this)">Cards</div>
-          <div class="filter-chip" onclick="setFilter('cred',this)">CRED</div>
-          <div class="filter-chip" onclick="setFilter('income',this)">Income</div>
-        </div>
       </div>
+    </div>
+    <div class="filter-scroll">
+      <div class="filter-chip active" onclick="setFilter('all',this)">All</div>
+      <div class="filter-chip" onclick="setFilter('gpay',this)">GPay UPI</div>
+      <div class="filter-chip" onclick="setFilter('cc_icici',this)">ICICI Card</div>
+      <div class="filter-chip" onclick="setFilter('cc_axis',this)">Axis Card</div>
+      <div class="filter-chip" onclick="setFilter('cc_kotak',this)">Kotak Card</div>
+      <div class="filter-chip" onclick="setFilter('cc_amazon',this)">Amazon Card</div>
+      <div class="filter-chip" onclick="setFilter('cred_icici',this)">CRED ICICI</div>
+      <div class="filter-chip" onclick="setFilter('cred_axis',this)">CRED Axis</div>
+      <div class="filter-chip" onclick="setFilter('cred_kotak',this)">CRED Kotak</div>
+      <div class="filter-chip" onclick="setFilter('cred_amazon',this)">CRED Amazon</div>
+      <div class="filter-chip" onclick="setFilter('expense',this)">Expenses</div>
+      <div class="filter-chip" onclick="setFilter('rent',this)">Rent</div>
+      <div class="filter-chip" onclick="setFilter('utilities',this)">Utilities</div>
+      <div class="filter-chip" onclick="setFilter('sip',this)">SIP</div>
+      <div class="filter-chip" onclick="setFilter('income',this)">Income</div>
+    </div>
+    <div style="height:14px;"></div>
+    <div class="txn-section">
       <div class="txn-list" id="fullList">
         <div class="empty-state">No transactions yet.</div>
       </div>
@@ -444,6 +487,7 @@
   <div class="bottom-nav">
     <div class="nav-item active" onclick="switchNav('home',this)"><div class="nav-icon">⊞</div><span>Home</span></div>
     <div class="nav-item" onclick="switchNav('add',this)"><div class="nav-icon">＋</div><span>Add</span></div>
+    <div class="nav-item" onclick="switchNav('cards',this)"><div class="nav-icon">▣</div><span>Cards</span></div>
     <div class="nav-item" onclick="switchNav('txns',this)"><div class="nav-icon">≡</div><span>History</span></div>
     <div class="nav-item" onclick="switchNav('analytics',this)"><div class="nav-icon">◎</div><span>Analytics</span></div>
   </div>
@@ -451,14 +495,15 @@
 
 <script>
 let transactions = JSON.parse(localStorage.getItem('paisa_txns2') || '[]');
-let emis = JSON.parse(localStorage.getItem('paisa_emis') || '[]');
+let emis         = JSON.parse(localStorage.getItem('paisa_emis')  || '[]');
 let activeFilter = 'all';
-let manualType = 'dr';
+let manualType   = 'dr';
 
 const today = new Date();
-document.getElementById('m-date').value = today.toISOString().split('T')[0];
+document.getElementById('m-date').value   = today.toISOString().split('T')[0];
 document.getElementById('emi-date').value = today.toISOString().split('T')[0];
-document.getElementById('monthBadge').textContent = today.toLocaleString('default',{month:'long'}) + ' ' + today.getFullYear();
+document.getElementById('monthBadge').textContent =
+  today.toLocaleString('default', { month: 'long' }) + ' ' + today.getFullYear();
 
 const CAT_LABEL = {
   expense:'Expense', gpay:'GPay UPI', rent:'Rent', utilities:'Utilities', sip:'SIP Debit',
@@ -472,132 +517,140 @@ const CAT_ICON = {
   cred_icici:'✦', cred_axis:'✦', cred_kotak:'✦', cred_amazon:'✦'
 };
 const CC_CARDS = [
-  { key:'icici',  label:'ICICI Card',  spendCat:'cc_icici',  credCat:'cred_icici',  cycleDay: 25 },
-  { key:'axis',   label:'Axis Card',   spendCat:'cc_axis',   credCat:'cred_axis',   cycleDay: 12 },
-  { key:'kotak',  label:'Kotak Card',  spendCat:'cc_kotak',  credCat:'cred_kotak',  cycleDay: 5  },
-  { key:'amazon', label:'Amazon Card', spendCat:'cc_amazon', credCat:'cred_amazon', cycleDay: 12 }
+  { key:'icici',  label:'ICICI Card',  spendCat:'cc_icici',  credCat:'cred_icici',  cycleDay:25, color:'var(--orange)' },
+  { key:'axis',   label:'Axis Card',   spendCat:'cc_axis',   credCat:'cred_axis',   cycleDay:12, color:'var(--red)'    },
+  { key:'kotak',  label:'Kotak Card',  spendCat:'cc_kotak',  credCat:'cred_kotak',  cycleDay:5,  color:'var(--amber)'  },
+  { key:'amazon', label:'Amazon Card', spendCat:'cc_amazon', credCat:'cred_amazon', cycleDay:12, color:'var(--blue)'   }
 ];
 const CC_CARD_LABELS = { cc_icici:'ICICI', cc_axis:'Axis', cc_kotak:'Kotak', cc_amazon:'Amazon' };
 
-// Returns { start, end } Date objects for the current billing cycle
-// cycleDay = day of month the cycle starts (e.g. 12 means 12th of each month)
+// Returns the current billing cycle {start, end} for a given cycleDay
 function getCurrentCycle(cycleDay) {
-  const now = today;
-  const d = now.getDate();
-  let cycleStart, cycleEnd;
+  var d   = today.getDate();
+  var m   = today.getMonth();
+  var y   = today.getFullYear();
+  var start, end;
   if (d >= cycleDay) {
-    // We're past the cycle start day — cycle started this month
-    cycleStart = new Date(now.getFullYear(), now.getMonth(), cycleDay);
-    cycleEnd   = new Date(now.getFullYear(), now.getMonth() + 1, cycleDay - 1);
+    start = new Date(y, m, cycleDay);
+    end   = new Date(y, m + 1, cycleDay - 1, 23, 59, 59);
   } else {
-    // We're before the cycle start day — cycle started last month
-    cycleStart = new Date(now.getFullYear(), now.getMonth() - 1, cycleDay);
-    cycleEnd   = new Date(now.getFullYear(), now.getMonth(), cycleDay - 1);
+    start = new Date(y, m - 1, cycleDay);
+    end   = new Date(y, m, cycleDay - 1, 23, 59, 59);
   }
-  cycleEnd.setHours(23, 59, 59);
-  return { start: cycleStart, end: cycleEnd };
+  return { start: start, end: end };
 }
 
-function fmtCycleDate(d) {
-  return d.getDate() + ' ' + d.toLocaleString('default', { month: 'short' });
+function getPrevCycle(cycleDay) {
+  var cur   = getCurrentCycle(cycleDay);
+  var start = new Date(cur.start);
+  start.setMonth(start.getMonth() - 1);
+  var end   = new Date(cur.start);
+  end.setDate(end.getDate() - 1);
+  end.setHours(23, 59, 59);
+  return { start: start, end: end };
 }
 
-function fmt(n) { return '₹' + Math.abs(n).toLocaleString('en-IN',{minimumFractionDigits:0,maximumFractionDigits:0}); }
-function save() { localStorage.setItem('paisa_txns2', JSON.stringify(transactions)); }
-function saveEMIs() { localStorage.setItem('paisa_emis', JSON.stringify(emis)); }
+function fmtCycleDate(dt) {
+  return dt.getDate() + ' ' + dt.toLocaleString('default', { month: 'short' });
+}
+
+function fmt(n) {
+  return '₹' + Math.abs(n).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+}
+function save()     { localStorage.setItem('paisa_txns2', JSON.stringify(transactions)); }
+function saveEMIs() { localStorage.setItem('paisa_emis',  JSON.stringify(emis)); }
 function showToast(msg) {
-  const t = document.getElementById('toast'); t.textContent = msg;
-  t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2200);
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 2200);
 }
 
-function isCCSpend(cat) { return cat && cat.startsWith('cc_'); }
-function isCredPay(cat) { return cat && cat.startsWith('cred_'); }
-function isIncome(cat) { return cat === 'salary' || cat === 'freelance'; }
-function ccKeyFromCred(credCat) { return credCat ? credCat.replace('cred_','') : null; }
-function ccKeyFromCC(ccCat) { return ccCat ? ccCat.replace('cc_','') : null; }
+function isCCSpend(cat)  { return cat && cat.startsWith('cc_'); }
+function isCredPay(cat)  { return cat && cat.startsWith('cred_'); }
+function isIncome(cat)   { return cat === 'salary' || cat === 'freelance'; }
 
-function confirmAdd() {}
-function discardParse() {}
+function confirmAdd()  {}
+function discardParse(){}
 
 function setMerchant(name) { document.getElementById('m-merchant').value = name; }
 
 function onCatChange() {
-  const cat = document.getElementById('m-category').value;
-  if (isIncome(cat)) { manualType = 'cr'; document.getElementById('btn-dr').classList.remove('active'); document.getElementById('btn-cr').classList.add('active'); }
-  else if (isCredPay(cat)) { manualType = 'dr'; document.getElementById('btn-dr').classList.add('active'); document.getElementById('btn-cr').classList.remove('active'); }
+  var cat = document.getElementById('m-category').value;
+  if (isIncome(cat)) {
+    manualType = 'cr';
+    document.getElementById('btn-dr').classList.remove('active');
+    document.getElementById('btn-cr').classList.add('active');
+  } else if (isCredPay(cat) || isCCSpend(cat)) {
+    manualType = 'dr';
+    document.getElementById('btn-dr').classList.add('active');
+    document.getElementById('btn-cr').classList.remove('active');
+  }
 }
 
 function setType(t) {
   manualType = t;
-  document.getElementById('btn-dr').classList.toggle('active', t==='dr');
-  document.getElementById('btn-cr').classList.toggle('active', t==='cr');
+  document.getElementById('btn-dr').classList.toggle('active', t === 'dr');
+  document.getElementById('btn-cr').classList.toggle('active', t === 'cr');
 }
 
 function addManual() {
-  const amount = parseFloat(document.getElementById('m-amount').value);
-  const merchant = document.getElementById('m-merchant').value.trim() || 'Transaction';
-  const category = document.getElementById('m-category').value;
-  const date = document.getElementById('m-date').value || today.toISOString().split('T')[0];
+  var amount   = parseFloat(document.getElementById('m-amount').value);
+  var merchant = document.getElementById('m-merchant').value.trim() || 'Transaction';
+  var category = document.getElementById('m-category').value;
+  var date     = document.getElementById('m-date').value || today.toISOString().split('T')[0];
   if (!amount || amount <= 0) { alert('Enter a valid amount.'); return; }
-  const type = isIncome(category) ? 'cr' : manualType;
-  addTransaction({ amount, merchant, type, category, date });
-  document.getElementById('m-amount').value = '';
+  var type = isIncome(category) ? 'cr' : manualType;
+  addTransaction({ amount: amount, merchant: merchant, type: type, category: category, date: date });
+  document.getElementById('m-amount').value   = '';
   document.getElementById('m-merchant').value = '';
   showToast('Transaction added!');
   switchNav('home', document.querySelectorAll('.nav-item')[0]);
 }
 
 function addTransaction(txn) {
-  const t = { ...txn, id: Date.now() };
+  var t = Object.assign({}, txn, { id: Date.now() });
   transactions.unshift(t);
-  if (isCredPay(t.category) && t.type === 'dr') {
-    const ccKey = ccKeyFromCred(t.category);
-  }
-  save(); render();
+  save();
+  render();
 }
 
 function deleteTxn(id) {
   if (!confirm('Delete this transaction?')) return;
-  transactions = transactions.filter(t => t.id !== id);
-  save(); render();
+  transactions = transactions.filter(function(t) { return t.id !== id; });
+  save();
+  render();
 }
 
 function setFilter(f, el) {
   activeFilter = f;
-  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('.filter-chip').forEach(function(c) { c.classList.remove('active'); });
   el.classList.add('active');
   render();
 }
 
 function filterMatch(t) {
-  if (activeFilter === 'all') return true;
-  if (activeFilter === 'gpay') return t.category === 'gpay';
-  if (activeFilter === 'cc') return isCCSpend(t.category);
-  if (activeFilter === 'cred') return isCredPay(t.category);
+  if (activeFilter === 'all')    return true;
   if (activeFilter === 'income') return isIncome(t.category);
-  return true;
+  return t.category === activeFilter;
 }
 
-function iconClass(t) {
-  if (t.type === 'cr' && isIncome(t.category)) return t.category;
-  return t.category;
-}
+function iconClass(t) { return t.category; }
 
 function txnHTML(t) {
-  const credNote = isCredPay(t.category) ? `<span class="cc-note">CC bill paid</span>` : '';
-  return `<div class="txn-item">
-    <div class="txn-icon ${iconClass(t)}">${CAT_ICON[t.category]||'◈'}</div>
-    <div class="txn-info">
-      <div class="txn-merchant">${t.merchant}</div>
-      <div class="txn-meta">
-        <span class="txn-tag tag-${t.category}">${CAT_LABEL[t.category]||t.category}</span>
-        <span>${t.date}</span>
-      </div>
-      ${credNote}
-    </div>
-    <span class="txn-amount ${t.type}">${t.type==='dr'?'−':'+'}${fmt(t.amount)}</span>
-    <button class="del-btn" onclick="deleteTxn(${t.id})">✕</button>
-  </div>`;
+  var credNote = isCredPay(t.category) ? '<span class="cc-note">CC bill paid</span>' : '';
+  return '<div class="txn-item">' +
+    '<div class="txn-icon ' + iconClass(t) + '">' + (CAT_ICON[t.category] || '◈') + '</div>' +
+    '<div class="txn-info">' +
+      '<div class="txn-merchant">' + t.merchant + '</div>' +
+      '<div class="txn-meta">' +
+        '<span class="txn-tag tag-' + t.category + '">' + (CAT_LABEL[t.category] || t.category) + '</span>' +
+        '<span>' + t.date + '</span>' +
+      '</div>' + credNote +
+    '</div>' +
+    '<span class="txn-amount ' + t.type + '">' + (t.type === 'dr' ? '−' : '+') + fmt(t.amount) + '</span>' +
+    '<button class="del-btn" onclick="deleteTxn(' + t.id + ')">✕</button>' +
+  '</div>';
 }
 
 /* ── EMI ── */
@@ -610,26 +663,28 @@ function switchAddTab(tab) {
 }
 
 function updateEMIPreview() {
-  const total = parseFloat(document.getElementById('emi-total').value);
-  const months = parseInt(document.getElementById('emi-months').value);
-  const prev = document.getElementById('emi-preview');
+  var total  = parseFloat(document.getElementById('emi-total').value);
+  var months = parseInt(document.getElementById('emi-months').value);
+  var prev   = document.getElementById('emi-preview');
   if (total > 0 && months > 0) {
     document.getElementById('emi-preview-val').textContent = fmt(Math.round(total / months)) + ' / month';
     prev.style.display = 'block';
-  } else { prev.style.display = 'none'; }
+  } else {
+    prev.style.display = 'none';
+  }
 }
 
 function addEMI() {
-  const name   = document.getElementById('emi-name').value.trim();
-  const total  = parseFloat(document.getElementById('emi-total').value);
-  const months = parseInt(document.getElementById('emi-months').value);
-  const card   = document.getElementById('emi-card').value;
-  const date   = document.getElementById('emi-date').value || today.toISOString().split('T')[0];
+  var name    = document.getElementById('emi-name').value.trim();
+  var total   = parseFloat(document.getElementById('emi-total').value);
+  var months  = parseInt(document.getElementById('emi-months').value);
+  var card    = document.getElementById('emi-card').value;
+  var date    = document.getElementById('emi-date').value || today.toISOString().split('T')[0];
   if (!name || !total || !months || months < 1) { alert('Please fill in all EMI fields.'); return; }
-  const monthly = Math.round(total / months);
-  emis.unshift({ id: Date.now(), name, total, months, card, date, monthly, paid: 0 });
+  var monthly = Math.round(total / months);
+  emis.unshift({ id: Date.now(), name: name, total: total, months: months, card: card, date: date, monthly: monthly, paid: 0 });
   saveEMIs(); renderEMIs(); renderAnalyticsEMI();
-  document.getElementById('emi-name').value = '';
+  document.getElementById('emi-name').value  = '';
   document.getElementById('emi-total').value = '';
   document.getElementById('emi-months').value = '';
   document.getElementById('emi-preview').style.display = 'none';
@@ -637,11 +692,10 @@ function addEMI() {
 }
 
 function markEMIPaid(id) {
-  const emi = emis.find(e => e.id === id);
+  var emi = emis.find(function(e) { return e.id === id; });
   if (!emi || emi.paid >= emi.months) { showToast('EMI already complete!'); return; }
   emi.paid += 1;
   saveEMIs();
-  // Record this instalment as a CC spend — it shows on the card balance, doesn't touch savings
   addTransaction({ amount: emi.monthly, merchant: emi.name + ' EMI', type: 'dr', category: emi.card, date: today.toISOString().split('T')[0] });
   renderEMIs(); renderAnalyticsEMI();
   showToast(emi.paid >= emi.months ? 'EMI fully paid off!' : 'Instalment recorded!');
@@ -649,212 +703,265 @@ function markEMIPaid(id) {
 
 function deleteEMI(id) {
   if (!confirm('Remove this EMI?')) return;
-  emis = emis.filter(e => e.id !== id);
+  emis = emis.filter(function(e) { return e.id !== id; });
   saveEMIs(); renderEMIs(); renderAnalyticsEMI();
 }
 
 function renderEMIs() {
-  const list = document.getElementById('emiList');
+  var list   = document.getElementById('emiList');
   if (!list) return;
-  const active = emis.filter(e => e.paid < e.months);
+  var active = emis.filter(function(e) { return e.paid < e.months; });
   if (!active.length) { list.innerHTML = '<div class="empty-state" style="padding:20px 0;">No EMIs added yet.</div>'; return; }
-  list.innerHTML = active.map(e => {
-    const pct = Math.round((e.paid / e.months) * 100);
-    const remaining = e.months - e.paid;
-    return `<div class="emi-item">
-      <div class="emi-item-top">
-        <div>
-          <div class="emi-name">${e.name}</div>
-          <div class="emi-sub">${CC_CARD_LABELS[e.card]} · ${e.months} months · since ${e.date}</div>
-        </div>
-        <div>
-          <div class="emi-monthly">${fmt(e.monthly)}</div>
-          <div class="emi-monthly-lbl">per month</div>
-        </div>
-      </div>
-      <div class="emi-track"><div class="emi-fill" style="width:${pct}%"></div></div>
-      <div class="emi-footer">
-        <span class="emi-footer-txt">${remaining} of ${e.months} left · ${fmt(remaining * e.monthly)} remaining</span>
-        <div style="display:flex;gap:6px;align-items:center;">
-          <button class="emi-mark-btn" onclick="markEMIPaid(${e.id})">Mark paid</button>
-          <button class="emi-del-btn" onclick="deleteEMI(${e.id})">✕</button>
-        </div>
-      </div>
-    </div>`;
+  list.innerHTML = active.map(function(e) {
+    var pct       = Math.round((e.paid / e.months) * 100);
+    var remaining = e.months - e.paid;
+    return '<div class="emi-item">' +
+      '<div class="emi-item-top">' +
+        '<div><div class="emi-name">' + e.name + '</div>' +
+        '<div class="emi-sub">' + CC_CARD_LABELS[e.card] + ' · ' + e.months + ' months · since ' + e.date + '</div></div>' +
+        '<div><div class="emi-monthly">' + fmt(e.monthly) + '</div>' +
+        '<div class="emi-monthly-lbl">per month</div></div>' +
+      '</div>' +
+      '<div class="emi-track"><div class="emi-fill" style="width:' + pct + '%"></div></div>' +
+      '<div class="emi-footer">' +
+        '<span class="emi-footer-txt">' + remaining + ' of ' + e.months + ' left · ' + fmt(remaining * e.monthly) + ' remaining</span>' +
+        '<div style="display:flex;gap:6px;align-items:center;">' +
+          '<button class="emi-mark-btn" onclick="markEMIPaid(' + e.id + ')">Mark paid</button>' +
+          '<button class="emi-del-btn"  onclick="deleteEMI('  + e.id + ')">✕</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
   }).join('');
 }
 
 function renderAnalyticsEMI() {
-  const el = document.getElementById('analyticsEMI');
+  var el     = document.getElementById('analyticsEMI');
   if (!el) return;
-  const active = emis.filter(e => e.paid < e.months);
+  var active = emis.filter(function(e) { return e.paid < e.months; });
   if (!active.length) { el.innerHTML = '<div class="empty-state" style="padding:10px 0;">No active EMIs.</div>'; return; }
-  const totalMonthly = active.reduce((s, e) => s + e.monthly, 0);
-  el.innerHTML = `
-    <div style="background:rgba(96,165,250,0.08);border:0.5px solid rgba(96,165,250,0.2);border-radius:14px;padding:14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">
-      <span style="font-size:12px;color:var(--muted);">Total monthly EMIs</span>
-      <span style="font-family:var(--mono);font-weight:800;font-size:18px;color:var(--blue);">${fmt(totalMonthly)}</span>
-    </div>
-    ${active.map(e=>`
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:0.5px solid var(--border);">
-      <div>
-        <div style="font-size:13px;font-weight:600;">${e.name}</div>
-        <div style="font-size:10px;color:var(--muted);">${CC_CARD_LABELS[e.card]} · ${e.months - e.paid} months left</div>
-      </div>
-      <span style="font-family:var(--mono);font-weight:700;color:var(--blue);">${fmt(e.monthly)}/mo</span>
-    </div>`).join('')}`;
+  var totalMonthly = active.reduce(function(s, e) { return s + e.monthly; }, 0);
+  el.innerHTML =
+    '<div style="background:rgba(96,165,250,0.08);border:0.5px solid rgba(96,165,250,0.2);border-radius:14px;padding:14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">' +
+      '<span style="font-size:12px;color:var(--muted);">Total monthly EMIs</span>' +
+      '<span style="font-family:var(--mono);font-weight:800;font-size:18px;color:var(--blue);">' + fmt(totalMonthly) + '</span>' +
+    '</div>' +
+    active.map(function(e) {
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:0.5px solid var(--border);">' +
+        '<div><div style="font-size:13px;font-weight:600;">' + e.name + '</div>' +
+        '<div style="font-size:10px;color:var(--muted);">' + CC_CARD_LABELS[e.card] + ' · ' + (e.months - e.paid) + ' months left</div></div>' +
+        '<span style="font-family:var(--mono);font-weight:700;color:var(--blue);">' + fmt(e.monthly) + '/mo</span>' +
+      '</div>';
+    }).join('');
 }
 
+/* ── Cards section ── */
+function renderCards() {
+  var el = document.getElementById('ccDetailSection');
+  if (!el) return;
+  el.innerHTML = CC_CARDS.map(function(card) {
+    var cur  = getCurrentCycle(card.cycleDay);
+    var prev = getPrevCycle(card.cycleDay);
+
+    var allSpends = transactions.filter(function(t) { return t.category === card.spendCat && t.type === 'dr'; });
+    var allPaid   = transactions.filter(function(t) { return t.category === card.credCat  && t.type === 'dr'; });
+
+    var curSpends  = allSpends.filter(function(t) { var d = new Date(t.date); return d >= cur.start  && d <= cur.end;  });
+    var prevSpends = allSpends.filter(function(t) { var d = new Date(t.date); return d >= prev.start && d <= prev.end; });
+    var curTotal   = curSpends.reduce(function(s,t)  { return s + t.amount; }, 0);
+    var prevTotal  = prevSpends.reduce(function(s,t) { return s + t.amount; }, 0);
+    var totalPaid  = allPaid.reduce(function(s,t)    { return s + t.amount; }, 0);
+
+    var curLabel  = fmtCycleDate(cur.start)  + ' – ' + fmtCycleDate(cur.end);
+    var prevLabel = fmtCycleDate(prev.start) + ' – ' + fmtCycleDate(prev.end);
+    var recent    = allSpends.slice(0, 5);
+
+    var recentRows = recent.length
+      ? recent.map(function(t) {
+          return '<div class="cc-detail-txn-row">' +
+            '<div><div style="font-size:13px;font-weight:600;">' + t.merchant + '</div>' +
+            '<div style="font-size:10px;color:var(--muted);">' + t.date + '</div></div>' +
+            '<span style="font-family:var(--mono);font-weight:700;color:var(--red);">−' + fmt(t.amount) + '</span>' +
+          '</div>';
+        }).join('')
+      : '<div class="cc-detail-empty">No spends yet.</div>';
+
+    return '<div class="cc-detail-card">' +
+      '<div class="cc-detail-header">' +
+        '<div>' +
+          '<div class="cc-detail-name" style="color:' + card.color + ';">' + card.label + '</div>' +
+          '<div class="cc-detail-cycle">Cycle: ' + card.cycleDay + 'th of each month</div>' +
+        '</div>' +
+        '<div style="text-align:right;">' +
+          '<div style="font-size:10px;color:var(--muted);margin-bottom:2px;">Paid to date</div>' +
+          '<div style="font-size:14px;font-weight:700;font-family:var(--mono);color:var(--green);">' + fmt(totalPaid) + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="cc-detail-body">' +
+        '<div class="cc-detail-cell">' +
+          '<div class="cc-detail-cell-label">Previous Bill</div>' +
+          '<div class="cc-detail-cell-amt" style="color:' + card.color + ';">' + fmt(prevTotal) + '</div>' +
+          '<div class="cc-detail-cell-sub">' + prevLabel + '</div>' +
+        '</div>' +
+        '<div class="cc-detail-cell">' +
+          '<div class="cc-detail-cell-label">This Cycle</div>' +
+          '<div class="cc-detail-cell-amt" style="color:var(--muted);">' + fmt(curTotal) + '</div>' +
+          '<div class="cc-detail-cell-sub">' + curLabel + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="cc-detail-txns">' +
+        '<div class="cc-detail-txn-header">Recent Spends</div>' +
+        recentRows +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+/* ── Main render ── */
 function render() {
-  const totalCr = transactions.filter(t=>t.type==='cr').reduce((s,t)=>s+t.amount,0);
-  const totalDr = transactions.filter(t=>t.type==='dr').reduce((s,t)=>s+t.amount,0);
-  const net = totalCr - totalDr;
+  var totalCr = transactions.filter(function(t) { return t.type === 'cr'; }).reduce(function(s,t) { return s+t.amount; }, 0);
+  var totalDr = transactions.filter(function(t) { return t.type === 'dr'; }).reduce(function(s,t) { return s+t.amount; }, 0);
+  var net = totalCr - totalDr;
 
-  document.getElementById('netBalance').textContent = (net>=0?'+':'−') + fmt(net);
-  document.getElementById('totalCr').textContent = fmt(totalCr);
-  document.getElementById('totalDr').textContent = fmt(totalDr);
-  document.getElementById('gpayTotal').textContent = fmt(transactions.filter(t=>t.category==='gpay'&&t.type==='dr').reduce((s,t)=>s+t.amount,0));
+  document.getElementById('netBalance').textContent = (net >= 0 ? '+' : '−') + fmt(net);
+  document.getElementById('totalCr').textContent    = fmt(totalCr);
+  document.getElementById('totalDr').textContent    = fmt(totalDr);
+  document.getElementById('gpayTotal').textContent  = fmt(transactions.filter(function(t) { return t.category==='gpay'&&t.type==='dr'; }).reduce(function(s,t){return s+t.amount;},0));
 
-  const credPaid = transactions.filter(t=>isCredPay(t.category)&&t.type==='dr').reduce((s,t)=>s+t.amount,0);
+  var credPaid = transactions.filter(function(t) { return isCredPay(t.category)&&t.type==='dr'; }).reduce(function(s,t){return s+t.amount;},0);
   document.getElementById('credTotal').textContent = fmt(credPaid);
 
-  const ccSpend = transactions.filter(t=>isCCSpend(t.category)&&t.type==='dr').reduce((s,t)=>s+t.amount,0);
+  var ccSpend = transactions.filter(function(t) { return isCCSpend(t.category)&&t.type==='dr'; }).reduce(function(s,t){return s+t.amount;},0);
   document.getElementById('ccTotal').textContent = fmt(ccSpend);
 
-  const days = [...new Set(transactions.map(t=>t.date))].length || 1;
-  const totalExpDr = transactions.filter(t=>t.type==='dr'&&!isCredPay(t.category)).reduce((s,t)=>s+t.amount,0);
-  document.getElementById('dailyAvg').textContent = fmt(totalExpDr/days);
+  var days = (function() { var ds=[]; transactions.forEach(function(t){if(ds.indexOf(t.date)<0)ds.push(t.date);}); return ds.length||1; })();
+  var totalExpDr = transactions.filter(function(t){return t.type==='dr'&&!isCredPay(t.category);}).reduce(function(s,t){return s+t.amount;},0);
+  document.getElementById('dailyAvg').textContent = fmt(totalExpDr / days);
 
-  const ccRowHTML = CC_CARDS.map(card => {
-    const cycle = getCurrentCycle(card.cycleDay);
-    const allSpends = transactions.filter(t=>t.category===card.spendCat&&t.type==='dr');
-    const allPaid   = transactions.filter(t=>t.category===card.credCat&&t.type==='dr');
-    const totalPaid = allPaid.reduce((s,t)=>s+t.amount,0);
-    if (allSpends.length === 0 && allPaid.length === 0) return '';
-    // Only count spends within the current billing cycle
-    const cycleSpends = allSpends.filter(t => {
-      const d = new Date(t.date);
-      return d >= cycle.start && d <= cycle.end;
-    });
-    const outstanding = cycleSpends.reduce((s,t)=>s+t.amount,0);
-    const cycleLabel = fmtCycleDate(cycle.start) + ' – ' + fmtCycleDate(cycle.end);
-    return `<div class="cc-card ${card.key}">
-      <div class="cc-card-name">${card.label}</div>
-      <div class="cc-card-bal">${fmt(outstanding)}</div>
-      <div class="cc-card-paid" style="color:var(--muted); font-size:10px; margin-top:4px;">
-        <span style="color:var(--muted);">${cycleLabel}</span>
-      </div>
-      <div style="font-size:10px;margin-top:3px;">
-        <span style="color:var(--red);">${fmt(outstanding)} this cycle</span>&nbsp;|&nbsp;<span style="color:var(--green);">${fmt(totalPaid)} paid to date</span>
-      </div>
-    </div>`;
+  // CC summary cards (home row) — show current cycle spend
+  var ccRowHTML = CC_CARDS.map(function(card) {
+    var cur   = getCurrentCycle(card.cycleDay);
+    var spends = transactions.filter(function(t){return t.category===card.spendCat&&t.type==='dr';});
+    var curSpends = spends.filter(function(t){var d=new Date(t.date);return d>=cur.start&&d<=cur.end;});
+    var curTotal  = curSpends.reduce(function(s,t){return s+t.amount;},0);
+    var allPaid   = transactions.filter(function(t){return t.category===card.credCat&&t.type==='dr';}).reduce(function(s,t){return s+t.amount;},0);
+    if (spends.length === 0 && allPaid === 0) return '';
+    return '<div class="cc-card ' + card.key + '">' +
+      '<div class="cc-card-name">' + card.label + '</div>' +
+      '<div class="cc-card-bal">' + fmt(curTotal) + '</div>' +
+      '<div class="cc-card-sub">This cycle · ' + fmtCycleDate(cur.start) + ' – ' + fmtCycleDate(cur.end) + '</div>' +
+    '</div>';
   }).join('');
-  document.getElementById('ccCardsRow').innerHTML = ccRowHTML || '';
+  document.getElementById('ccCardsRow').innerHTML = ccRowHTML;
 
-  const credCoins = Math.floor(credPaid / 100);
+  var credCoins = Math.floor(credPaid / 100);
   document.getElementById('credCoins').textContent = credCoins.toLocaleString('en-IN');
 
-  const SAVINGS_GOAL = 10000;
-  const BANK_DEBIT_CATS = ['gpay','rent','utilities','sip','expense','cred_icici','cred_axis','cred_kotak','cred_amazon'];
-  const monthIncome = transactions.filter(t=>isIncome(t.category)&&t.type==='cr').reduce((s,t)=>s+t.amount,0);
-  const bankDebits = transactions.filter(t=>t.type==='dr'&&BANK_DEBIT_CATS.includes(t.category)).reduce((s,t)=>s+t.amount,0);
-  const saved = monthIncome - bankDebits;
-  const pct = monthIncome === 0 ? 0 : Math.min(100, Math.round((saved / SAVINGS_GOAL) * 100));
-  const state = saved >= SAVINGS_GOAL ? 'safe' : saved >= 5000 ? 'warn' : 'danger';
-  const alertEl = document.getElementById('savingsAlert');
-  const fillEl = document.getElementById('progressFill');
-  const labelEl = document.getElementById('alertLabel');
-  const subEl = document.getElementById('alertSub');
+  // Savings
+  var SAVINGS_GOAL   = 10000;
+  var BANK_DEBIT_CATS = ['gpay','rent','utilities','sip','expense','cred_icici','cred_axis','cred_kotak','cred_amazon'];
+  var monthIncome = transactions.filter(function(t){return isIncome(t.category)&&t.type==='cr';}).reduce(function(s,t){return s+t.amount;},0);
+  var bankDebits  = transactions.filter(function(t){return t.type==='dr'&&BANK_DEBIT_CATS.indexOf(t.category)>=0;}).reduce(function(s,t){return s+t.amount;},0);
+  var saved = monthIncome - bankDebits;
+  var pct   = monthIncome === 0 ? 0 : Math.min(100, Math.round((saved / SAVINGS_GOAL) * 100));
+  var state = saved >= SAVINGS_GOAL ? 'safe' : saved >= 5000 ? 'warn' : 'danger';
+  var alertEl = document.getElementById('savingsAlert');
+  var fillEl  = document.getElementById('progressFill');
+  var labelEl = document.getElementById('alertLabel');
+  var subEl   = document.getElementById('alertSub');
   alertEl.className = 'savings-alert ' + state;
   labelEl.className = 'alert-label ' + state;
   labelEl.textContent = saved >= SAVINGS_GOAL ? 'Savings goal reached!' : saved >= 5000 ? 'Savings on track' : monthIncome === 0 ? 'Monthly Savings' : 'Savings below target';
-  document.getElementById('alertVal').textContent = fmt(Math.max(0,saved)) + ' saved of ' + fmt(SAVINGS_GOAL) + ' goal';
-  fillEl.className = 'progress-fill ' + state;
+  document.getElementById('alertVal').textContent = fmt(Math.max(0, saved)) + ' saved of ' + fmt(SAVINGS_GOAL) + ' goal';
+  fillEl.className   = 'progress-fill ' + state;
   fillEl.style.width = Math.max(0, pct) + '%';
-  subEl.textContent = monthIncome === 0
+  subEl.textContent  = monthIncome === 0
     ? 'Add a Salary or Freelance credit to start tracking.'
     : saved < 0
     ? 'Overspent by ' + fmt(Math.abs(saved)) + ' this month.'
     : saved >= SAVINGS_GOAL
-    ? 'Great job! ₹' + Math.max(0,saved-SAVINGS_GOAL).toLocaleString('en-IN') + ' above your goal.'
-    : 'Spend ' + fmt(SAVINGS_GOAL - saved) + ' less to hit your ₹10,000 goal. CC spends not counted.';
+    ? 'Great job! \u20b9' + Math.max(0, saved - SAVINGS_GOAL).toLocaleString('en-IN') + ' above your goal.'
+    : 'Spend ' + fmt(SAVINGS_GOAL - saved) + ' less to hit your \u20b910,000 goal. CC spends not counted.';
 
-  const foodApps = [
-    { id:'swiggy', re:/swiggy/i },
-    { id:'zomato', re:/zomato/i },
-    { id:'blinkit', re:/blinkit|grofers/i },
+  // Food cards
+  var foodApps = [
+    { id:'swiggy',  re:/swiggy/i },
+    { id:'zomato',  re:/zomato/i },
+    { id:'blinkit', re:/blinkit|grofers/i }
   ];
-  let anyFood = false;
-  foodApps.forEach(app => {
-    const orders = transactions.filter(t=>t.type==='dr'&&(app.re.test(t.merchant)||app.re.test(t.category)));
-    const total = orders.reduce((s,t)=>s+t.amount,0);
+  var anyFood = false;
+  foodApps.forEach(function(app) {
+    var orders = transactions.filter(function(t){return t.type==='dr'&&(app.re.test(t.merchant)||app.re.test(t.category));});
+    var total  = orders.reduce(function(s,t){return s+t.amount;},0);
     if (total > 0) anyFood = true;
-    document.getElementById(app.id+'Amt').textContent = fmt(total);
+    document.getElementById(app.id+'Amt').textContent   = fmt(total);
     document.getElementById(app.id+'Count').textContent = orders.length + (orders.length===1?' order':' orders');
   });
   document.getElementById('foodSection').style.display = anyFood ? 'block' : 'none';
 
   // SIP card
-  const sipTxns = transactions.filter(t=>t.category==='sip'&&t.type==='dr');
-  const sipTotal = sipTxns.reduce((s,t)=>s+t.amount,0);
-  const currMonth = today.getMonth(); const currYear = today.getFullYear();
-  const sipMonth = sipTxns.filter(t=>{ const d=new Date(t.date); return d.getMonth()===currMonth&&d.getFullYear()===currYear; }).reduce((s,t)=>s+t.amount,0);
-  const sipCard = document.getElementById('sipCard');
-  sipCard.style.display = sipTotal > 0 ? 'flex' : 'none';
-  document.getElementById('sipTotal').textContent = fmt(sipTotal);
-  document.getElementById('sipCount').textContent = sipTxns.length + (sipTxns.length===1?' instalment':' instalments');
-  document.getElementById('sipMonth').textContent = fmt(sipMonth);
+  var sipTxns  = transactions.filter(function(t){return t.category==='sip'&&t.type==='dr';});
+  var sipTotal = sipTxns.reduce(function(s,t){return s+t.amount;},0);
+  var cm = today.getMonth(); var cy = today.getFullYear();
+  var sipMonth = sipTxns.filter(function(t){var d=new Date(t.date);return d.getMonth()===cm&&d.getFullYear()===cy;}).reduce(function(s,t){return s+t.amount;},0);
+  document.getElementById('sipCard').style.display   = sipTotal > 0 ? 'flex' : 'none';
+  document.getElementById('sipTotal').textContent    = fmt(sipTotal);
+  document.getElementById('sipCount').textContent    = sipTxns.length + (sipTxns.length===1?' instalment':' instalments');
+  document.getElementById('sipMonth').textContent    = fmt(sipMonth);
 
-  const filtered = transactions.filter(filterMatch);
+  // History list
+  var filtered = transactions.filter(filterMatch);
   document.getElementById('fullList').innerHTML = filtered.length
     ? filtered.map(txnHTML).join('')
     : '<div class="empty-state">No transactions found.</div>';
 
-  const barCats = [
+  // Analytics bars
+  var barCats = [
     {key:'expense',label:'Expense',color:'var(--accent)'},
-    {key:'gpay',label:'GPay',color:'var(--teal)'},
-    {key:'rent',label:'Rent',color:'var(--red)'},
+    {key:'gpay',   label:'GPay',   color:'var(--teal)'},
+    {key:'rent',   label:'Rent',   color:'var(--red)'},
     {key:'utilities',label:'Utils',color:'var(--blue)'},
-    {key:'sip',label:'SIP',color:'var(--accent2)'},
-    {key:'cc_icici',label:'ICICI',color:'var(--orange)'},
-    {key:'cc_axis',label:'Axis',color:'#f87171'},
-    {key:'cc_kotak',label:'Kotak',color:'var(--amber)'},
-    {key:'cc_amazon',label:'Amzn',color:'var(--blue)'},
+    {key:'sip',    label:'SIP',    color:'var(--accent2)'},
+    {key:'cc_icici',label:'ICICI', color:'var(--orange)'},
+    {key:'cc_axis', label:'Axis',  color:'var(--red)'},
+    {key:'cc_kotak',label:'Kotak', color:'var(--amber)'},
+    {key:'cc_amazon',label:'Amzn', color:'var(--blue)'}
   ];
-  const barTotals = barCats.map(c=>transactions.filter(t=>t.category===c.key&&t.type==='dr').reduce((s,t)=>s+t.amount,0));
-  const maxBar = Math.max(...barTotals, 1);
-  document.getElementById('catBars').innerHTML = barCats.map((c,i)=>`
-    <div class="bar-col">
-      <div class="bar-val">${barTotals[i]>0?fmt(barTotals[i]):''}</div>
-      <div class="bar" style="height:${Math.max(3,(barTotals[i]/maxBar)*80)}px;background:${c.color};"></div>
-      <div class="bar-lbl">${c.label}</div>
-    </div>`).join('');
+  var barTotals = barCats.map(function(c){return transactions.filter(function(t){return t.category===c.key&&t.type==='dr';}).reduce(function(s,t){return s+t.amount;},0);});
+  var maxBar = Math.max.apply(null, barTotals.concat([1]));
+  document.getElementById('catBars').innerHTML = barCats.map(function(c,i){
+    return '<div class="bar-col">' +
+      '<div class="bar-val">' + (barTotals[i]>0?fmt(barTotals[i]):'') + '</div>' +
+      '<div class="bar" style="height:' + Math.max(3,(barTotals[i]/maxBar)*80) + 'px;background:' + c.color + ';"></div>' +
+      '<div class="bar-lbl">' + c.label + '</div>' +
+    '</div>';
+  }).join('');
 
-  const allCats = Object.keys(CAT_LABEL);
-  const catColors2 = { expense:'var(--accent)', gpay:'var(--teal)', rent:'var(--red)', utilities:'var(--blue)', sip:'var(--accent2)', salary:'var(--green)', freelance:'var(--green)', cc_icici:'var(--orange)', cc_axis:'var(--red)', cc_kotak:'var(--amber)', cc_amazon:'var(--blue)', cred_icici:'var(--amber)', cred_axis:'var(--amber)', cred_kotak:'var(--amber)', cred_amazon:'var(--amber)' };
-  const rows = allCats.map(c => {
-    const tot = transactions.filter(t=>t.category===c).reduce((s,t)=>s+t.amount,0);
+  // Breakdown
+  var catColors2 = {expense:'var(--accent)',gpay:'var(--teal)',rent:'var(--red)',utilities:'var(--blue)',sip:'var(--accent2)',salary:'var(--green)',freelance:'var(--green)',cc_icici:'var(--orange)',cc_axis:'var(--red)',cc_kotak:'var(--amber)',cc_amazon:'var(--blue)',cred_icici:'var(--amber)',cred_axis:'var(--amber)',cred_kotak:'var(--amber)',cred_amazon:'var(--amber)'};
+  var rows = Object.keys(CAT_LABEL).map(function(c){
+    var tot   = transactions.filter(function(t){return t.category===c;}).reduce(function(s,t){return s+t.amount;},0);
     if (!tot) return '';
-    const isInc = isIncome(c);
-    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:0.5px solid var(--border);">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <div style="width:9px;height:9px;border-radius:50%;background:${catColors2[c]||'var(--accent)'};"></div>
-        <span style="font-size:13px;">${CAT_LABEL[c]}</span>
-      </div>
-      <span style="font-family:var(--mono);font-weight:700;color:${isInc?'var(--green)':'var(--red)'};">${isInc?'+':'−'}${fmt(tot)}</span>
-    </div>`;
+    var isInc = isIncome(c);
+    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:0.5px solid var(--border);">' +
+      '<div style="display:flex;align-items:center;gap:10px;">' +
+        '<div style="width:9px;height:9px;border-radius:50%;background:' + (catColors2[c]||'var(--accent)') + ';"></div>' +
+        '<span style="font-size:13px;">' + CAT_LABEL[c] + '</span>' +
+      '</div>' +
+      '<span style="font-family:var(--mono);font-weight:700;color:' + (isInc?'var(--green)':'var(--red)') + ';">' + (isInc?'+':'−') + fmt(tot) + '</span>' +
+    '</div>';
   }).join('');
   document.getElementById('breakdown').innerHTML = rows || '<div class="empty-state">No data yet.</div>';
 
   renderAnalyticsEMI();
+  renderCards();
 }
 
 function switchNav(section, el) {
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active');});
   el.classList.add('active');
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.getElementById('sec-'+section).classList.add('active');
-  window.scrollTo({top:0,behavior:'smooth'});
+  document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active');});
+  document.getElementById('sec-' + section).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 render();
