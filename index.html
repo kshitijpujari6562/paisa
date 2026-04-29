@@ -91,7 +91,12 @@
     .txn-icon.gpay { background: rgba(45,212,191,0.12); }
     .txn-icon.cred_icici,.txn-icon.cred_axis,.txn-icon.cred_kotak,.txn-icon.cred_amazon { background: rgba(251,191,36,0.12); }
     .txn-icon.cc_icici { background: rgba(251,146,60,0.12); }
-    .txn-icon.cc_axis  { background: rgba(248,113,113,0.12); }
+    .txn-icon.cc_axis_neo { background: rgba(244,114,182,0.12); }
+    .txn-icon.cred_axis_neo { background: rgba(251,191,36,0.12); }
+    .tag-cc_axis_neo   { background: rgba(244,114,182,0.12); color: var(--pink); }
+    .tag-cred_axis_neo { background: rgba(251,191,36,0.12);  color: var(--amber); }
+    .cc-card.axis_neo  { border-color: rgba(244,114,182,0.3); }
+    .cc-card.axis_neo .cc-card-bal { color: var(--pink); }
     .txn-icon.cc_kotak { background: rgba(251,191,36,0.12); }
     .txn-icon.cc_amazon{ background: rgba(96,165,250,0.12); }
     .txn-icon.expense  { background: rgba(124,106,247,0.12); }
@@ -272,8 +277,7 @@
     <div class="food-section" id="foodSection" style="display:none;">
       <div class="food-row-label">Food &amp; Delivery</div>
       <div class="food-cards">
-        <div class="food-card"><div class="food-card-icon">🍊</div><div class="food-card-name">Swiggy</div><div class="food-card-amt" id="swiggyAmt">₹0</div><div class="food-card-count" id="swiggyCount">0 orders</div></div>
-        <div class="food-card"><div class="food-card-icon">🍅</div><div class="food-card-name">Zomato</div><div class="food-card-amt" id="zomatoAmt">₹0</div><div class="food-card-count" id="zomatoCount">0 orders</div></div>
+        <div class="food-card"><div class="food-card-icon">🍔</div><div class="food-card-name">Swiggy + Zomato</div><div class="food-card-amt" id="foodDeliveryAmt">₹0</div><div class="food-card-count" id="foodDeliveryCount">0 orders</div></div>
         <div class="food-card"><div class="food-card-icon">🛒</div><div class="food-card-name">Blinkit</div><div class="food-card-amt" id="blinkitAmt">₹0</div><div class="food-card-count" id="blinkitCount">0 orders</div></div>
       </div>
     </div>
@@ -342,12 +346,14 @@
               <optgroup label="Credit Card Spends">
                 <option value="cc_icici">ICICI Credit Card</option>
                 <option value="cc_axis">Axis Credit Card</option>
+                <option value="cc_axis_neo">Axis Neo RuPay Card</option>
                 <option value="cc_kotak">Kotak Credit Card</option>
                 <option value="cc_amazon">Amazon Card</option>
               </optgroup>
               <optgroup label="CRED Payments">
                 <option value="cred_icici">CRED — ICICI Payment</option>
                 <option value="cred_axis">CRED — Axis Payment</option>
+                <option value="cred_axis_neo">CRED — Axis Neo Payment</option>
                 <option value="cred_kotak">CRED — Kotak Payment</option>
                 <option value="cred_amazon">CRED — Amazon Payment</option>
               </optgroup>
@@ -395,6 +401,7 @@
             <select id="emi-card">
               <option value="cc_icici">ICICI</option>
               <option value="cc_axis">Axis</option>
+              <option value="cc_axis_neo">Axis Neo</option>
               <option value="cc_kotak">Kotak</option>
               <option value="cc_amazon">Amazon</option>
             </select>
@@ -439,6 +446,7 @@
       <div class="filter-chip" onclick="setFilter('gpay',this)">GPay UPI</div>
       <div class="filter-chip" onclick="setFilter('cc_icici',this)">ICICI Card</div>
       <div class="filter-chip" onclick="setFilter('cc_axis',this)">Axis Card</div>
+      <div class="filter-chip" onclick="setFilter('cc_axis_neo',this)">Axis Neo</div>
       <div class="filter-chip" onclick="setFilter('cc_kotak',this)">Kotak Card</div>
       <div class="filter-chip" onclick="setFilter('cc_amazon',this)">Amazon Card</div>
       <div class="filter-chip" onclick="setFilter('cred_icici',this)">CRED ICICI</div>
@@ -508,21 +516,22 @@ document.getElementById('monthBadge').textContent =
 const CAT_LABEL = {
   expense:'Expense', gpay:'GPay UPI', rent:'Rent', utilities:'Utilities', sip:'SIP Debit',
   salary:'Salary', freelance:'Freelance',
-  cc_icici:'ICICI Card', cc_axis:'Axis Card', cc_kotak:'Kotak Card', cc_amazon:'Amazon Card',
-  cred_icici:'CRED→ICICI', cred_axis:'CRED→Axis', cred_kotak:'CRED→Kotak', cred_amazon:'CRED→Amazon'
+  cc_icici:'ICICI Card', cc_axis:'Axis Card', cc_axis_neo:'Axis Neo Card', cc_kotak:'Kotak Card', cc_amazon:'Amazon Card',
+  cred_icici:'CRED→ICICI', cred_axis:'CRED→Axis', cred_axis_neo:'CRED→Axis Neo', cred_kotak:'CRED→Kotak', cred_amazon:'CRED→Amazon'
 };
 const CAT_ICON = {
   expense:'◈', gpay:'⬡', rent:'⌂', utilities:'⚡', sip:'◑', salary:'⊕', freelance:'⊕',
-  cc_icici:'▣', cc_axis:'▣', cc_kotak:'▣', cc_amazon:'▣',
-  cred_icici:'✦', cred_axis:'✦', cred_kotak:'✦', cred_amazon:'✦'
+  cc_icici:'▣', cc_axis:'▣', cc_axis_neo:'▣', cc_kotak:'▣', cc_amazon:'▣',
+  cred_icici:'✦', cred_axis:'✦', cred_axis_neo:'✦', cred_kotak:'✦', cred_amazon:'✦'
 };
 const CC_CARDS = [
-  { key:'icici',  label:'ICICI Card',  spendCat:'cc_icici',  credCat:'cred_icici',  cycleDay:25, color:'var(--orange)' },
-  { key:'axis',   label:'Axis Card',   spendCat:'cc_axis',   credCat:'cred_axis',   cycleDay:12, color:'var(--red)'    },
-  { key:'kotak',  label:'Kotak Card',  spendCat:'cc_kotak',  credCat:'cred_kotak',  cycleDay:5,  color:'var(--amber)'  },
-  { key:'amazon', label:'Amazon Card', spendCat:'cc_amazon', credCat:'cred_amazon', cycleDay:12, color:'var(--blue)'   }
+  { key:'icici',    label:'ICICI Card',    spendCat:'cc_icici',    credCat:'cred_icici',    cycleDay:25, color:'var(--orange)' },
+  { key:'axis',     label:'Axis Card',     spendCat:'cc_axis',     credCat:'cred_axis',     cycleDay:12, color:'var(--red)'    },
+  { key:'axis_neo', label:'Axis Neo Card', spendCat:'cc_axis_neo', credCat:'cred_axis_neo', cycleDay:27, color:'var(--pink)'   },
+  { key:'kotak',    label:'Kotak Card',    spendCat:'cc_kotak',    credCat:'cred_kotak',    cycleDay:5,  color:'var(--amber)'  },
+  { key:'amazon',   label:'Amazon Card',   spendCat:'cc_amazon',   credCat:'cred_amazon',   cycleDay:12, color:'var(--blue)'   }
 ];
-const CC_CARD_LABELS = { cc_icici:'ICICI', cc_axis:'Axis', cc_kotak:'Kotak', cc_amazon:'Amazon' };
+const CC_CARD_LABELS = { cc_icici:'ICICI', cc_axis:'Axis', cc_axis_neo:'Axis Neo', cc_kotak:'Kotak', cc_amazon:'Amazon' };
 
 // Returns the current billing cycle {start, end} for a given cycleDay
 function getCurrentCycle(cycleDay) {
@@ -882,20 +891,16 @@ function render() {
     ? 'Great job! \u20b9' + Math.max(0, saved - SAVINGS_GOAL).toLocaleString('en-IN') + ' above your goal.'
     : 'Spend ' + fmt(SAVINGS_GOAL - saved) + ' less to hit your \u20b910,000 goal. CC spends not counted.';
 
-  // Food cards
-  var foodApps = [
-    { id:'swiggy',  re:/swiggy/i },
-    { id:'zomato',  re:/zomato/i },
-    { id:'blinkit', re:/blinkit|grofers/i }
-  ];
-  var anyFood = false;
-  foodApps.forEach(function(app) {
-    var orders = transactions.filter(function(t){return t.type==='dr'&&(app.re.test(t.merchant)||app.re.test(t.category));});
-    var total  = orders.reduce(function(s,t){return s+t.amount;},0);
-    if (total > 0) anyFood = true;
-    document.getElementById(app.id+'Amt').textContent   = fmt(total);
-    document.getElementById(app.id+'Count').textContent = orders.length + (orders.length===1?' order':' orders');
-  });
+  // Food cards — Swiggy+Zomato merged, Blinkit separate
+  var foodOrders   = transactions.filter(function(t){return t.type==='dr'&&(/swiggy/i.test(t.merchant)||/zomato/i.test(t.merchant));});
+  var blinkitOrders= transactions.filter(function(t){return t.type==='dr'&&(/blinkit|grofers/i.test(t.merchant));});
+  var foodTotal    = foodOrders.reduce(function(s,t){return s+t.amount;},0);
+  var blinkitTotal = blinkitOrders.reduce(function(s,t){return s+t.amount;},0);
+  var anyFood = foodTotal > 0 || blinkitTotal > 0;
+  document.getElementById('foodDeliveryAmt').textContent   = fmt(foodTotal);
+  document.getElementById('foodDeliveryCount').textContent = foodOrders.length + (foodOrders.length===1?' order':' orders');
+  document.getElementById('blinkitAmt').textContent        = fmt(blinkitTotal);
+  document.getElementById('blinkitCount').textContent      = blinkitOrders.length + (blinkitOrders.length===1?' order':' orders');
   document.getElementById('foodSection').style.display = anyFood ? 'block' : 'none';
 
   // SIP card
@@ -937,7 +942,7 @@ function render() {
   }).join('');
 
   // Breakdown
-  var catColors2 = {expense:'var(--accent)',gpay:'var(--teal)',rent:'var(--red)',utilities:'var(--blue)',sip:'var(--accent2)',salary:'var(--green)',freelance:'var(--green)',cc_icici:'var(--orange)',cc_axis:'var(--red)',cc_kotak:'var(--amber)',cc_amazon:'var(--blue)',cred_icici:'var(--amber)',cred_axis:'var(--amber)',cred_kotak:'var(--amber)',cred_amazon:'var(--amber)'};
+  var catColors2 = {expense:'var(--accent)',gpay:'var(--teal)',rent:'var(--red)',utilities:'var(--blue)',sip:'var(--accent2)',salary:'var(--green)',freelance:'var(--green)',cc_icici:'var(--orange)',cc_axis:'var(--red)',cc_axis_neo:'var(--pink)',cc_kotak:'var(--amber)',cc_amazon:'var(--blue)',cred_icici:'var(--amber)',cred_axis:'var(--amber)',cred_axis_neo:'var(--amber)',cred_kotak:'var(--amber)',cred_amazon:'var(--amber)'};
   var rows = Object.keys(CAT_LABEL).map(function(c){
     var tot   = transactions.filter(function(t){return t.category===c;}).reduce(function(s,t){return s+t.amount;},0);
     if (!tot) return '';
