@@ -490,6 +490,15 @@
       <div style="font-size:11px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;">Monthly EMI Burden</div>
       <div id="analyticsEMI"><div class="empty-state" style="padding:10px 0;">No active EMIs.</div></div>
     </div>
+
+    <div style="padding:20px 20px 0;">
+      <div style="font-size:11px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;">Data Transfer</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <button onclick="exportData()" style="width:100%;padding:14px;background:rgba(52,211,153,0.1);border:0.5px solid rgba(52,211,153,0.3);border-radius:12px;color:var(--green);font-size:13px;font-weight:700;font-family:var(--font);cursor:pointer;">↑ Export My Data</button>
+        <textarea id="importBox" placeholder="Paste exported data here to import..." style="height:80px;font-size:12px;"></textarea>
+        <button onclick="importData()" style="width:100%;padding:14px;background:rgba(96,165,250,0.1);border:0.5px solid rgba(96,165,250,0.3);border-radius:12px;color:var(--blue);font-size:13px;font-weight:700;font-family:var(--font);cursor:pointer;">↓ Import Data</button>
+      </div>
+    </div>
   </div>
 
   <div class="bottom-nav">
@@ -826,6 +835,50 @@ function renderCards() {
 }
 
 /* ── Main render ── */
+function exportData() {
+  var payload = {
+    txns: transactions,
+    emis: emis
+  };
+  var str = JSON.stringify(payload);
+  // Copy to clipboard
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(str).then(function() {
+      showToast('Copied to clipboard!');
+    }).catch(function() {
+      showExportFallback(str);
+    });
+  } else {
+    showExportFallback(str);
+  }
+}
+
+function showExportFallback(str) {
+  var box = document.getElementById('importBox');
+  box.value = str;
+  box.select();
+  showToast('Data shown below — copy it manually');
+}
+
+function importData() {
+  var raw = document.getElementById('importBox').value.trim();
+  if (!raw) { alert('Paste your exported data first.'); return; }
+  try {
+    var parsed = JSON.parse(raw);
+    if (!parsed.txns || !Array.isArray(parsed.txns)) { alert('Invalid data format.'); return; }
+    if (!confirm('This will replace all current data. Continue?')) return;
+    transactions = parsed.txns;
+    emis = parsed.emis || [];
+    save();
+    saveEMIs();
+    render();
+    document.getElementById('importBox').value = '';
+    showToast('Data imported!');
+  } catch(e) {
+    alert('Could not read data. Make sure you pasted it correctly.');
+  }
+}
+
 function render() {
   var totalCr = transactions.filter(function(t) { return t.type === 'cr'; }).reduce(function(s,t) { return s+t.amount; }, 0);
   var totalDr = transactions.filter(function(t) { return t.type === 'dr'; }).reduce(function(s,t) { return s+t.amount; }, 0);
