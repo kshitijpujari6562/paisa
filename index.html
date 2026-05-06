@@ -714,9 +714,8 @@ function markEMIPaid(id) {
   if (!emi || emi.paid >= emi.months) { showToast('EMI already complete!'); return; }
   emi.paid += 1;
   saveEMIs();
-  addTransaction({ amount: emi.monthly, merchant: emi.name + ' EMI', type: 'dr', category: emi.card, date: today.toISOString().split('T')[0] });
   renderEMIs(); renderAnalyticsEMI();
-  showToast(emi.paid >= emi.months ? 'EMI fully paid off!' : 'Instalment recorded!');
+  showToast(emi.paid >= emi.months ? 'EMI fully paid off!' : 'Instalment ' + emi.paid + ' of ' + emi.months + ' marked!');
 }
 
 function deleteEMI(id) {
