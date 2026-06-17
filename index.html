@@ -770,10 +770,13 @@ function renderMonthly() {
   ];
   el.innerHTML=keys.map(function(key){
     var m=months[key];
-    var debits=m.txns.filter(function(t){return t.type==='dr';});
+    var debits=m.txns.filter(function(t){return t.type==='dr'&&!isCCSpend(t.category);});
     var credits=m.txns.filter(function(t){return t.type==='cr';});
     var totalDr=debits.reduce(function(s,t){return s+t.amount;},0);
     var totalCr=credits.reduce(function(s,t){return s+t.amount;},0);
+    // CC spends shown separately for reference
+    var ccDebits=m.txns.filter(function(t){return t.type==='dr'&&isCCSpend(t.category);});
+    var ccTotal=ccDebits.reduce(function(s,t){return s+t.amount;},0);
     var totals=barCats.map(function(c){return debits.filter(function(t){return t.category===c.key;}).reduce(function(s,t){return s+t.amount;},0);});
     var maxBar=Math.max.apply(null,totals.concat([1]));
     var miniBarHTML=barCats.map(function(c,i){
@@ -797,6 +800,7 @@ function renderMonthly() {
         '<div style="text-align:right;">'+
           '<div class="month-card-total">−'+fmt(totalDr)+'</div>'+
           '<div style="font-size:11px;color:var(--green);margin-top:2px;">+'+fmt(totalCr)+'</div>'+
+          (ccTotal>0?'<div style="font-size:10px;color:var(--muted);margin-top:1px;">CC: '+fmt(ccTotal)+'</div>':'')+
         '</div>'+
       '</div>'+
       '<div class="month-card-body">'+
@@ -808,8 +812,10 @@ function renderMonthly() {
 }
 
 function render() {
+  // Real debits = everything except CC spends (those aren't real bank outflows yet)
+  var realDebits=transactions.filter(function(t){return t.type==='dr'&&!isCCSpend(t.category);});
   var totalCr=transactions.filter(function(t){return t.type==='cr';}).reduce(function(s,t){return s+t.amount;},0);
-  var totalDr=transactions.filter(function(t){return t.type==='dr';}).reduce(function(s,t){return s+t.amount;},0);
+  var totalDr=realDebits.reduce(function(s,t){return s+t.amount;},0);
   var net=totalCr-totalDr;
   document.getElementById('netBalance').textContent=(net>=0?'+':'−')+fmt(net);
   document.getElementById('totalCr').textContent=fmt(totalCr);
@@ -821,8 +827,8 @@ function render() {
   document.getElementById('ccTotal').textContent=fmt(ccSpend);
   var dateSet={}; transactions.forEach(function(t){dateSet[t.date]=1;});
   var days=Object.keys(dateSet).length||1;
-  var totalExpDr=transactions.filter(function(t){return t.type==='dr'&&!isCredPay(t.category);}).reduce(function(s,t){return s+t.amount;},0);
-  document.getElementById('dailyAvg').textContent=fmt(totalExpDr/days);
+  // Daily avg: only real bank debits (no CC spends)
+  document.getElementById('dailyAvg').textContent=fmt(totalDr/days);
 
   // CC summary row on home
   var ccRowHTML=CC_CARDS.map(function(card){
