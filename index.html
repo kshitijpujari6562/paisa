@@ -87,6 +87,7 @@
     .txn-icon.salary,.txn-icon.freelance{background:rgba(52,211,153,0.12)}
     .txn-icon.rent{background:rgba(248,113,113,0.12)}
     .txn-icon.sip{background:rgba(96,165,250,0.12)}
+    .txn-icon.stocks{background:rgba(52,211,153,0.12)}
     .txn-icon.utilities{background:rgba(96,165,250,0.12)}
     .txn-info{flex:1;min-width:0}
     .txn-merchant{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -103,6 +104,7 @@
     .tag-salary,.tag-freelance{background:rgba(52,211,153,0.12);color:var(--green)}
     .tag-rent{background:rgba(248,113,113,0.12);color:var(--red)}
     .tag-sip{background:rgba(96,165,250,0.12);color:var(--blue)}
+    .tag-stocks{background:rgba(52,211,153,0.12);color:var(--green)}
     .tag-utilities{background:rgba(96,165,250,0.12);color:var(--blue)}
     .txn-amount{font-family:var(--mono);font-size:14px;font-weight:700;flex-shrink:0}
     .txn-amount.dr{color:var(--red)}.txn-amount.cr{color:var(--green)}
@@ -259,6 +261,20 @@
         <div style="font-size:16px;font-weight:700;font-family:var(--mono);color:var(--blue);" id="sipMonth">₹0</div>
       </div>
     </div>
+    <div class="sip-card" id="stocksCard" style="display:none;border-color:rgba(52,211,153,0.3);">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div class="sip-card-icon" style="background:rgba(52,211,153,0.12);">▲</div>
+        <div>
+          <div class="sip-card-label">Stocks Invested</div>
+          <div class="sip-card-amt" style="color:var(--green);" id="stocksTotal">₹0</div>
+          <div class="sip-card-count" id="stocksCount">0 purchases</div>
+        </div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">This month</div>
+        <div style="font-size:16px;font-weight:700;font-family:var(--mono);color:var(--green);" id="stocksMonth">₹0</div>
+      </div>
+    </div>
     <div style="padding:0 20px 16px;">
       <div onclick="switchNav('txns',document.querySelectorAll('.nav-item')[4])" style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:0.5px solid var(--border2);border-radius:14px;padding:16px;cursor:pointer;">
         <span style="font-size:13px;font-weight:600;">View All Transactions</span>
@@ -302,6 +318,7 @@
                 <option value="rent">Rent</option>
                 <option value="utilities">Utilities</option>
                 <option value="sip">SIP Debit</option>
+                <option value="stocks">Stocks</option>
                 <option value="gpay">GPay UPI</option>
               </optgroup>
               <optgroup label="Credit Card Spends">
@@ -401,6 +418,7 @@
       <div class="filter-chip" onclick="setFilter('rent',this)">Rent</div>
       <div class="filter-chip" onclick="setFilter('utilities',this)">Utilities</div>
       <div class="filter-chip" onclick="setFilter('sip',this)">SIP</div>
+      <div class="filter-chip" onclick="setFilter('stocks',this)">Stocks</div>
       <div class="filter-chip" onclick="setFilter('income',this)">Income</div>
     </div>
     <div style="height:14px;"></div>
@@ -458,13 +476,13 @@ document.getElementById('m-date').value = today.toISOString().split('T')[0];
 document.getElementById('monthBadge').textContent = today.toLocaleString('default',{month:'long'}) + ' ' + today.getFullYear();
 
 var CAT_LABEL = {
-  expense:'Expense', gpay:'GPay UPI', rent:'Rent', utilities:'Utilities', sip:'SIP Debit',
+  expense:'Expense', gpay:'GPay UPI', rent:'Rent', utilities:'Utilities', sip:'SIP Debit', stocks:'Stocks',
   salary:'Salary', freelance:'Freelance',
   cc_icici:'ICICI Card', cc_axis:'Axis Card', cc_axis_neo:'Axis Neo Card', cc_kotak:'Kotak Card', cc_amazon:'Amazon Card',
   cred_icici:'CRED→ICICI', cred_axis:'CRED→Axis', cred_axis_neo:'CRED→Axis Neo', cred_kotak:'CRED→Kotak', cred_amazon:'CRED→Amazon'
 };
 var CAT_ICON = {
-  expense:'◈', gpay:'⬡', rent:'⌂', utilities:'⚡', sip:'◑', salary:'⊕', freelance:'⊕',
+  expense:'◈', gpay:'⬡', rent:'⌂', utilities:'⚡', sip:'◑', stocks:'▲', salary:'⊕', freelance:'⊕',
   cc_icici:'▣', cc_axis:'▣', cc_axis_neo:'▣', cc_kotak:'▣', cc_amazon:'▣',
   cred_icici:'✦', cred_axis:'✦', cred_axis_neo:'✦', cred_kotak:'✦', cred_amazon:'✦'
 };
@@ -744,53 +762,59 @@ function renderCards() {
   }).join('');
 }
 
-// Monthly report
+// Monthly report — simple, clean
 function renderMonthly() {
   var el=document.getElementById('monthlySection');
   if (!el) return;
   if (!transactions.length){el.innerHTML='<div class="empty-state">No transactions yet.</div>';return;}
+
+  // Group by YYYY-MM
   var months={};
   transactions.forEach(function(t){
     var d=new Date(t.date);
-    var key=d.getFullYear()+'-'+(d.getMonth()+1);
+    var key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
     if (!months[key]) months[key]={label:d.toLocaleString('default',{month:'long',year:'numeric'}),txns:[]};
     months[key].txns.push(t);
   });
-  var keys=Object.keys(months).sort().reverse();
-  var barCats=[
-    {key:'expense',label:'Exp',color:'var(--accent)'},
-    {key:'gpay',   label:'GPay',color:'var(--teal)'},
-    {key:'cc_icici',label:'ICICI',color:'var(--orange)'},
-    {key:'cc_axis', label:'Axis', color:'var(--red)'},
-    {key:'cc_axis_neo',label:'Neo',color:'var(--pink)'},
-    {key:'cc_kotak',label:'Kotak',color:'var(--amber)'},
-    {key:'cc_amazon',label:'Amzn',color:'var(--blue)'},
-    {key:'rent',   label:'Rent',color:'#f87171'},
-    {key:'sip',    label:'SIP', color:'var(--accent2)'}
+
+  var cats=[
+    {key:'expense',  label:'Daily Expenses',  color:'var(--accent)'},
+    {key:'gpay',     label:'GPay UPI',         color:'var(--teal)'},
+    {key:'rent',     label:'Rent',             color:'var(--red)'},
+    {key:'utilities',label:'Utilities',        color:'var(--blue)'},
+    {key:'sip',      label:'SIP',              color:'var(--accent2)'},
+    {key:'stocks',   label:'Stocks',           color:'var(--green)'},
+    {key:'cc_icici', label:'ICICI Card',       color:'var(--orange)'},
+    {key:'cc_axis',  label:'Axis Card',        color:'var(--red)'},
+    {key:'cc_axis_neo',label:'Axis Neo Card',  color:'var(--pink)'},
+    {key:'cc_kotak', label:'Kotak Card',       color:'var(--amber)'},
+    {key:'cc_amazon',label:'Amazon Card',      color:'var(--blue)'},
+    {key:'cred_icici',label:'CRED ICICI',      color:'var(--amber)'},
+    {key:'cred_axis', label:'CRED Axis',       color:'var(--amber)'},
+    {key:'cred_axis_neo',label:'CRED Axis Neo',color:'var(--amber)'},
+    {key:'cred_kotak',label:'CRED Kotak',      color:'var(--amber)'},
+    {key:'cred_amazon',label:'CRED Amazon',    color:'var(--amber)'}
   ];
+
+  var keys=Object.keys(months).sort().reverse();
   el.innerHTML=keys.map(function(key){
     var m=months[key];
-    var debits=m.txns.filter(function(t){return t.type==='dr'&&!isCCSpend(t.category);});
-    var credits=m.txns.filter(function(t){return t.type==='cr';});
-    var totalDr=debits.reduce(function(s,t){return s+t.amount;},0);
-    var totalCr=credits.reduce(function(s,t){return s+t.amount;},0);
-    // CC spends shown separately for reference
-    var ccDebits=m.txns.filter(function(t){return t.type==='dr'&&isCCSpend(t.category);});
-    var ccTotal=ccDebits.reduce(function(s,t){return s+t.amount;},0);
-    var totals=barCats.map(function(c){return debits.filter(function(t){return t.category===c.key;}).reduce(function(s,t){return s+t.amount;},0);});
-    var maxBar=Math.max.apply(null,totals.concat([1]));
-    var miniBarHTML=barCats.map(function(c,i){
-      return totals[i]>0?'<div class="month-mini-bar-col">'+
-        '<div class="month-mini-bar" style="height:'+Math.max(2,(totals[i]/maxBar)*36)+'px;background:'+c.color+';"></div>'+
-        '<div class="month-mini-bar-lbl">'+c.label+'</div>'+
-      '</div>':'';
+    // Real debits only (no CC spends) for total
+    var realDr=m.txns.filter(function(t){return t.type==='dr'&&!isCCSpend(t.category);}).reduce(function(s,t){return s+t.amount;},0);
+    var totalCr=m.txns.filter(function(t){return t.type==='cr';}).reduce(function(s,t){return s+t.amount;},0);
+
+    var rows=cats.map(function(c){
+      var amt=m.txns.filter(function(t){return t.category===c.key&&t.type==='dr';}).reduce(function(s,t){return s+t.amount;},0);
+      if (!amt) return '';
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:0.5px solid var(--border);">'+
+        '<div style="display:flex;align-items:center;gap:8px;">'+
+          '<div style="width:8px;height:8px;border-radius:50%;background:'+c.color+';flex-shrink:0;"></div>'+
+          '<span style="font-size:13px;">'+c.label+'</span>'+
+        '</div>'+
+        '<span style="font-family:var(--mono);font-weight:700;color:var(--red);">−'+fmt(amt)+'</span>'+
+      '</div>';
     }).join('');
-    var catRows=barCats.map(function(c,i){
-      return totals[i]>0?'<div class="month-row">'+
-        '<span class="month-row-label">'+CAT_LABEL[c.key]||c.label+'</span>'+
-        '<span class="month-row-val" style="color:'+c.color+';">−'+fmt(totals[i])+'</span>'+
-      '</div>':'';
-    }).join('');
+
     return '<div class="month-card">'+
       '<div class="month-card-header">'+
         '<div>'+
@@ -798,15 +822,11 @@ function renderMonthly() {
           '<div style="font-size:10px;color:var(--muted);margin-top:2px;">'+m.txns.length+' transactions</div>'+
         '</div>'+
         '<div style="text-align:right;">'+
-          '<div class="month-card-total">−'+fmt(totalDr)+'</div>'+
-          '<div style="font-size:11px;color:var(--green);margin-top:2px;">+'+fmt(totalCr)+'</div>'+
-          (ccTotal>0?'<div style="font-size:10px;color:var(--muted);margin-top:1px;">CC: '+fmt(ccTotal)+'</div>':'')+
+          '<div style="font-size:18px;font-weight:800;font-family:var(--mono);color:var(--red);">−'+fmt(realDr)+'</div>'+
+          '<div style="font-size:11px;color:var(--green);margin-top:2px;">+'+fmt(totalCr)+' income</div>'+
         '</div>'+
       '</div>'+
-      '<div class="month-card-body">'+
-        (miniBarHTML?'<div class="month-mini-bars">'+miniBarHTML+'</div>':'')+
-        catRows+
-      '</div>'+
+      (rows?'<div>'+rows+'</div>':'<div style="padding:16px;text-align:center;color:var(--muted);font-size:13px;">No spends</div>')+
     '</div>';
   }).join('');
 }
@@ -849,7 +869,7 @@ function render() {
 
   // Savings
   var SAVINGS_GOAL=10000;
-  var BANK_CATS=['gpay','rent','utilities','sip','expense','cred_icici','cred_axis','cred_axis_neo','cred_kotak','cred_amazon'];
+  var BANK_CATS=['gpay','rent','utilities','sip','stocks','expense','cred_icici','cred_axis','cred_axis_neo','cred_kotak','cred_amazon'];
   var monthIncome=transactions.filter(function(t){return isIncome(t.category)&&t.type==='cr';}).reduce(function(s,t){return s+t.amount;},0);
   var bankDebits=transactions.filter(function(t){return t.type==='dr'&&BANK_CATS.indexOf(t.category)>=0;}).reduce(function(s,t){return s+t.amount;},0);
   var saved=monthIncome-bankDebits;
@@ -887,6 +907,15 @@ function render() {
   document.getElementById('sipCount').textContent=sipTxns.length+(sipTxns.length===1?' instalment':' instalments');
   document.getElementById('sipMonth').textContent=fmt(sipMonth);
 
+  // Stocks
+  var stocksTxns=transactions.filter(function(t){return t.category==='stocks'&&t.type==='dr';});
+  var stocksTotal=stocksTxns.reduce(function(s,t){return s+t.amount;},0);
+  var stocksMonth=stocksTxns.filter(function(t){var d=new Date(t.date);return d.getMonth()===cm&&d.getFullYear()===cy;}).reduce(function(s,t){return s+t.amount;},0);
+  document.getElementById('stocksCard').style.display=stocksTotal>0?'flex':'none';
+  document.getElementById('stocksTotal').textContent=fmt(stocksTotal);
+  document.getElementById('stocksCount').textContent=stocksTxns.length+(stocksTxns.length===1?' purchase':' purchases');
+  document.getElementById('stocksMonth').textContent=fmt(stocksMonth);
+
   // History
   var filtered=transactions.filter(filterMatch);
   document.getElementById('fullList').innerHTML=filtered.length?filtered.map(txnHTML).join(''):'<div class="empty-state">No transactions found.</div>';
@@ -915,7 +944,7 @@ function render() {
   }).join('');
 
   // Breakdown
-  var catColors2={expense:'var(--accent)',gpay:'var(--teal)',rent:'var(--red)',utilities:'var(--blue)',sip:'var(--accent2)',salary:'var(--green)',freelance:'var(--green)',cc_icici:'var(--orange)',cc_axis:'var(--red)',cc_axis_neo:'var(--pink)',cc_kotak:'var(--amber)',cc_amazon:'var(--blue)',cred_icici:'var(--amber)',cred_axis:'var(--amber)',cred_axis_neo:'var(--amber)',cred_kotak:'var(--amber)',cred_amazon:'var(--amber)'};
+  var catColors2={expense:'var(--accent)',gpay:'var(--teal)',rent:'var(--red)',utilities:'var(--blue)',sip:'var(--accent2)',stocks:'var(--green)',salary:'var(--green)',freelance:'var(--green)',cc_icici:'var(--orange)',cc_axis:'var(--red)',cc_axis_neo:'var(--pink)',cc_kotak:'var(--amber)',cc_amazon:'var(--blue)',cred_icici:'var(--amber)',cred_axis:'var(--amber)',cred_axis_neo:'var(--amber)',cred_kotak:'var(--amber)',cred_amazon:'var(--amber)'};
   var brows=Object.keys(CAT_LABEL).map(function(c){
     var tot=transactions.filter(function(t){return t.category===c;}).reduce(function(s,t){return s+t.amount;},0);
     if (!tot) return '';
