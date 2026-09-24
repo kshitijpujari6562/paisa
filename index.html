@@ -389,9 +389,13 @@
 
   <!-- MONTHLY -->
   <div class="section" id="sec-monthly">
-    <div style="padding:0 20px 16px;">
-      <div style="font-size:22px;font-weight:800;margin-bottom:4px;">Monthly Report</div>
-      <div style="font-size:11px;color:var(--muted);">Spend breakdown by month</div>
+    <div style="padding:0 20px 12px;">
+      <div style="font-size:22px;font-weight:800;margin-bottom:12px;">Monthly Report</div>
+      <div class="add-type-toggle" style="padding:0;">
+        <div class="add-type-btn active" id="mtab-all" onclick="switchMonthlyTab('all')">All Expenses</div>
+        <div class="add-type-btn" id="mtab-food" onclick="switchMonthlyTab('food')">Swiggy + Zomato</div>
+        <div class="add-type-btn" id="mtab-blinkit" onclick="switchMonthlyTab('blinkit')">Blinkit</div>
+      </div>
     </div>
     <div id="monthlySection"></div>
   </div>
@@ -762,7 +766,16 @@ function renderCards() {
   }).join('');
 }
 
-// Monthly report — simple, clean
+var monthlyTab='all';
+function switchMonthlyTab(tab) {
+  monthlyTab=tab;
+  ['all','food','blinkit'].forEach(function(t){
+    document.getElementById('mtab-'+t).classList.toggle('active',t===tab);
+  });
+  renderMonthly();
+}
+
+// Monthly report
 function renderMonthly() {
   var el=document.getElementById('monthlySection');
   if (!el) return;
@@ -776,33 +789,110 @@ function renderMonthly() {
     if (!months[key]) months[key]={label:d.toLocaleString('default',{month:'long',year:'numeric'}),txns:[]};
     months[key].txns.push(t);
   });
+  var keys=Object.keys(months).sort().reverse();
 
+  if (monthlyTab==='food') {
+    // Swiggy + Zomato month by month
+    var allFood=transactions.filter(function(t){return t.type==='dr'&&(/swiggy/i.test(t.merchant)||/zomato/i.test(t.merchant));});
+    var grandTotal=allFood.reduce(function(s,t){return s+t.amount;},0);
+    var grandCount=allFood.length;
+    el.innerHTML=
+      '<div style="margin:0 20px 16px;background:var(--surface);border:0.5px solid var(--border);border-radius:16px;padding:16px;display:flex;justify-content:space-between;align-items:center;">'+
+        '<div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;">All-time Total</div>'+
+        '<div>'+
+          '<div style="font-size:22px;font-weight:800;font-family:var(--mono);color:var(--red);text-align:right;">'+fmt(grandTotal)+'</div>'+
+          '<div style="font-size:11px;color:var(--muted);text-align:right;">'+grandCount+' orders</div>'+
+        '</div>'+
+      '</div>'+
+      keys.map(function(key){
+        var m=months[key];
+        var orders=m.txns.filter(function(t){return t.type==='dr'&&(/swiggy/i.test(t.merchant)||/zomato/i.test(t.merchant));});
+        if (!orders.length) return '';
+        var total=orders.reduce(function(s,t){return s+t.amount;},0);
+        var swiggyTotal=orders.filter(function(t){return /swiggy/i.test(t.merchant);}).reduce(function(s,t){return s+t.amount;},0);
+        var zomatoTotal=orders.filter(function(t){return /zomato/i.test(t.merchant);}).reduce(function(s,t){return s+t.amount;},0);
+        return '<div class="month-card">'+
+          '<div class="month-card-header">'+
+            '<div><div class="month-card-title">'+m.label+'</div>'+
+            '<div style="font-size:10px;color:var(--muted);margin-top:2px;">'+orders.length+' orders</div></div>'+
+            '<div class="month-card-total">'+fmt(total)+'</div>'+
+          '</div>'+
+          '<div>'+
+            (swiggyTotal>0?'<div style="display:flex;justify-content:space-between;align-items:center;padding:11px 16px;border-bottom:0.5px solid var(--border);">'+
+              '<div style="display:flex;align-items:center;gap:8px;"><span>🍊</span><span style="font-size:13px;">Swiggy</span></div>'+
+              '<span style="font-family:var(--mono);font-weight:700;color:var(--orange);">'+fmt(swiggyTotal)+'</span>'+
+            '</div>':'')+
+            (zomatoTotal>0?'<div style="display:flex;justify-content:space-between;align-items:center;padding:11px 16px;">'+
+              '<div style="display:flex;align-items:center;gap:8px;"><span>🍅</span><span style="font-size:13px;">Zomato</span></div>'+
+              '<span style="font-family:var(--mono);font-weight:700;color:var(--red);">'+fmt(zomatoTotal)+'</span>'+
+            '</div>':'')+
+          '</div>'+
+        '</div>';
+      }).join('');
+    return;
+  }
+
+  if (monthlyTab==='blinkit') {
+    // Blinkit month by month
+    var allBlinkit=transactions.filter(function(t){return t.type==='dr'&&/blinkit|grofers/i.test(t.merchant);});
+    var bGrandTotal=allBlinkit.reduce(function(s,t){return s+t.amount;},0);
+    var bGrandCount=allBlinkit.length;
+    el.innerHTML=
+      '<div style="margin:0 20px 16px;background:var(--surface);border:0.5px solid var(--border);border-radius:16px;padding:16px;display:flex;justify-content:space-between;align-items:center;">'+
+        '<div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;">All-time Total</div>'+
+        '<div>'+
+          '<div style="font-size:22px;font-weight:800;font-family:var(--mono);color:var(--amber);text-align:right;">'+fmt(bGrandTotal)+'</div>'+
+          '<div style="font-size:11px;color:var(--muted);text-align:right;">'+bGrandCount+' orders</div>'+
+        '</div>'+
+      '</div>'+
+      keys.map(function(key){
+        var m=months[key];
+        var orders=m.txns.filter(function(t){return t.type==='dr'&&/blinkit|grofers/i.test(t.merchant);});
+        if (!orders.length) return '';
+        var total=orders.reduce(function(s,t){return s+t.amount;},0);
+        return '<div class="month-card">'+
+          '<div class="month-card-header">'+
+            '<div><div class="month-card-title">'+m.label+'</div>'+
+            '<div style="font-size:10px;color:var(--muted);margin-top:2px;">'+orders.length+' orders</div></div>'+
+            '<div class="month-card-total" style="color:var(--amber);">'+fmt(total)+'</div>'+
+          '</div>'+
+          '<div>'+
+            orders.map(function(t){
+              return '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-top:0.5px solid var(--border);">'+
+                '<div><div style="font-size:12px;font-weight:600;">'+t.merchant+'</div>'+
+                '<div style="font-size:10px;color:var(--muted);">'+t.date+'</div></div>'+
+                '<span style="font-family:var(--mono);font-weight:700;color:var(--amber);">'+fmt(t.amount)+'</span>'+
+              '</div>';
+            }).join('')+
+          '</div>'+
+        '</div>';
+      }).join('');
+    return;
+  }
+
+  // Default: All Expenses
   var cats=[
-    {key:'expense',  label:'Daily Expenses',  color:'var(--accent)'},
-    {key:'gpay',     label:'GPay UPI',         color:'var(--teal)'},
-    {key:'rent',     label:'Rent',             color:'var(--red)'},
-    {key:'utilities',label:'Utilities',        color:'var(--blue)'},
-    {key:'sip',      label:'SIP',              color:'var(--accent2)'},
-    {key:'stocks',   label:'Stocks',           color:'var(--green)'},
-    {key:'cc_icici', label:'ICICI Card',       color:'var(--orange)'},
-    {key:'cc_axis',  label:'Axis Card',        color:'var(--red)'},
+    {key:'expense',   label:'Daily Expenses', color:'var(--accent)'},
+    {key:'gpay',      label:'GPay UPI',        color:'var(--teal)'},
+    {key:'rent',      label:'Rent',            color:'var(--red)'},
+    {key:'utilities', label:'Utilities',       color:'var(--blue)'},
+    {key:'sip',       label:'SIP',             color:'var(--accent2)'},
+    {key:'stocks',    label:'Stocks',          color:'var(--green)'},
+    {key:'cc_icici',  label:'ICICI Card',      color:'var(--orange)'},
+    {key:'cc_axis',   label:'Axis Card',       color:'var(--red)'},
     {key:'cc_axis_neo',label:'Axis Neo Card',  color:'var(--pink)'},
-    {key:'cc_kotak', label:'Kotak Card',       color:'var(--amber)'},
-    {key:'cc_amazon',label:'Amazon Card',      color:'var(--blue)'},
+    {key:'cc_kotak',  label:'Kotak Card',      color:'var(--amber)'},
+    {key:'cc_amazon', label:'Amazon Card',     color:'var(--blue)'},
     {key:'cred_icici',label:'CRED ICICI',      color:'var(--amber)'},
     {key:'cred_axis', label:'CRED Axis',       color:'var(--amber)'},
     {key:'cred_axis_neo',label:'CRED Axis Neo',color:'var(--amber)'},
     {key:'cred_kotak',label:'CRED Kotak',      color:'var(--amber)'},
     {key:'cred_amazon',label:'CRED Amazon',    color:'var(--amber)'}
   ];
-
-  var keys=Object.keys(months).sort().reverse();
   el.innerHTML=keys.map(function(key){
     var m=months[key];
-    // Real debits only (no CC spends) for total
     var realDr=m.txns.filter(function(t){return t.type==='dr'&&!isCCSpend(t.category);}).reduce(function(s,t){return s+t.amount;},0);
     var totalCr=m.txns.filter(function(t){return t.type==='cr';}).reduce(function(s,t){return s+t.amount;},0);
-
     var rows=cats.map(function(c){
       var amt=m.txns.filter(function(t){return t.category===c.key&&t.type==='dr';}).reduce(function(s,t){return s+t.amount;},0);
       if (!amt) return '';
@@ -814,7 +904,6 @@ function renderMonthly() {
         '<span style="font-family:var(--mono);font-weight:700;color:var(--red);">−'+fmt(amt)+'</span>'+
       '</div>';
     }).join('');
-
     return '<div class="month-card">'+
       '<div class="month-card-header">'+
         '<div>'+
