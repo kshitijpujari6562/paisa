@@ -88,6 +88,7 @@
     .txn-icon.rent{background:rgba(248,113,113,0.12)}
     .txn-icon.sip{background:rgba(96,165,250,0.12)}
     .txn-icon.stocks{background:rgba(52,211,153,0.12)}
+    .txn-icon.cigs{background:rgba(148,163,184,0.12)}
     .txn-icon.utilities{background:rgba(96,165,250,0.12)}
     .txn-info{flex:1;min-width:0}
     .txn-merchant{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -105,6 +106,7 @@
     .tag-rent{background:rgba(248,113,113,0.12);color:var(--red)}
     .tag-sip{background:rgba(96,165,250,0.12);color:var(--blue)}
     .tag-stocks{background:rgba(52,211,153,0.12);color:var(--green)}
+    .tag-cigs{background:rgba(148,163,184,0.12);color:#94a3b8}
     .tag-utilities{background:rgba(96,165,250,0.12);color:var(--blue)}
     .txn-amount{font-family:var(--mono);font-size:14px;font-weight:700;flex-shrink:0}
     .txn-amount.dr{color:var(--red)}.txn-amount.cr{color:var(--green)}
@@ -319,6 +321,7 @@
                 <option value="utilities">Utilities</option>
                 <option value="sip">SIP Debit</option>
                 <option value="stocks">Stocks</option>
+                <option value="cigs">Cigarettes</option>
                 <option value="gpay">GPay UPI</option>
               </optgroup>
               <optgroup label="Credit Card Spends">
@@ -341,10 +344,11 @@
         <div class="form-row">
           <div class="form-group">
             <label>Merchant / Note</label>
-            <div style="display:flex;gap:6px;margin-bottom:6px;">
+            <div style="display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap;">
               <div onclick="setMerchant('Swiggy')" style="padding:4px 10px;border-radius:20px;background:rgba(251,146,60,0.1);border:0.5px solid rgba(251,146,60,0.3);color:var(--orange);font-size:11px;cursor:pointer;">🍊 Swiggy</div>
               <div onclick="setMerchant('Zomato')" style="padding:4px 10px;border-radius:20px;background:rgba(248,113,113,0.1);border:0.5px solid rgba(248,113,113,0.3);color:var(--red);font-size:11px;cursor:pointer;">🍅 Zomato</div>
               <div onclick="setMerchant('Blinkit')" style="padding:4px 10px;border-radius:20px;background:rgba(251,191,36,0.1);border:0.5px solid rgba(251,191,36,0.3);color:var(--amber);font-size:11px;cursor:pointer;">🛒 Blinkit</div>
+              <div onclick="quickAddCig()" style="padding:4px 10px;border-radius:20px;background:rgba(148,163,184,0.1);border:0.5px solid rgba(148,163,184,0.3);color:#94a3b8;font-size:11px;cursor:pointer;">🚬 Cig</div>
             </div>
             <input type="text" id="m-merchant" placeholder="Swiggy, Salary..." />
           </div>
@@ -393,8 +397,8 @@
       <div style="font-size:22px;font-weight:800;margin-bottom:12px;">Monthly Report</div>
       <div class="add-type-toggle" style="padding:0;">
         <div class="add-type-btn active" id="mtab-all" onclick="switchMonthlyTab('all')">All Expenses</div>
-        <div class="add-type-btn" id="mtab-food" onclick="switchMonthlyTab('food')">Swiggy + Zomato</div>
-        <div class="add-type-btn" id="mtab-blinkit" onclick="switchMonthlyTab('blinkit')">Blinkit</div>
+        <div class="add-type-btn" id="mtab-food" onclick="switchMonthlyTab('food')">Food & Delivery</div>
+        <div class="add-type-btn" id="mtab-cigs" onclick="switchMonthlyTab('cigs')">Cigs</div>
       </div>
     </div>
     <div id="monthlySection"></div>
@@ -423,6 +427,7 @@
       <div class="filter-chip" onclick="setFilter('utilities',this)">Utilities</div>
       <div class="filter-chip" onclick="setFilter('sip',this)">SIP</div>
       <div class="filter-chip" onclick="setFilter('stocks',this)">Stocks</div>
+      <div class="filter-chip" onclick="setFilter('cigs',this)">Cigs</div>
       <div class="filter-chip" onclick="setFilter('income',this)">Income</div>
     </div>
     <div style="height:14px;"></div>
@@ -480,13 +485,13 @@ document.getElementById('m-date').value = today.toISOString().split('T')[0];
 document.getElementById('monthBadge').textContent = today.toLocaleString('default',{month:'long'}) + ' ' + today.getFullYear();
 
 var CAT_LABEL = {
-  expense:'Expense', gpay:'GPay UPI', rent:'Rent', utilities:'Utilities', sip:'SIP Debit', stocks:'Stocks',
+  expense:'Expense', gpay:'GPay UPI', rent:'Rent', utilities:'Utilities', sip:'SIP Debit', stocks:'Stocks', cigs:'Cigarettes',
   salary:'Salary', freelance:'Freelance',
   cc_icici:'ICICI Card', cc_axis:'Axis Card', cc_axis_neo:'Axis Neo Card', cc_kotak:'Kotak Card', cc_amazon:'Amazon Card',
   cred_icici:'CRED→ICICI', cred_axis:'CRED→Axis', cred_axis_neo:'CRED→Axis Neo', cred_kotak:'CRED→Kotak', cred_amazon:'CRED→Amazon'
 };
 var CAT_ICON = {
-  expense:'◈', gpay:'⬡', rent:'⌂', utilities:'⚡', sip:'◑', stocks:'▲', salary:'⊕', freelance:'⊕',
+  expense:'◈', gpay:'⬡', rent:'⌂', utilities:'⚡', sip:'◑', stocks:'▲', cigs:'🚬', salary:'⊕', freelance:'⊕',
   cc_icici:'▣', cc_axis:'▣', cc_axis_neo:'▣', cc_kotak:'▣', cc_amazon:'▣',
   cred_icici:'✦', cred_axis:'✦', cred_axis_neo:'✦', cred_kotak:'✦', cred_amazon:'✦'
 };
@@ -769,10 +774,20 @@ function renderCards() {
 var monthlyTab='all';
 function switchMonthlyTab(tab) {
   monthlyTab=tab;
-  ['all','food','blinkit'].forEach(function(t){
+  ['all','food','cigs'].forEach(function(t){
     document.getElementById('mtab-'+t).classList.toggle('active',t===tab);
   });
   renderMonthly();
+}
+
+// quickAddCig — opens Add tab with Cigs pre-selected
+function quickAddCig() {
+  document.getElementById('m-category').value='cigs';
+  manualType='dr';
+  document.getElementById('btn-dr').classList.add('active');
+  document.getElementById('btn-cr').classList.remove('active');
+  document.getElementById('m-merchant').value='Cigarettes';
+  switchNav('add', document.querySelectorAll('.nav-item')[1]);
 }
 
 // Monthly report
@@ -792,25 +807,32 @@ function renderMonthly() {
   var keys=Object.keys(months).sort().reverse();
 
   if (monthlyTab==='food') {
-    // Swiggy + Zomato month by month
-    var allFood=transactions.filter(function(t){return t.type==='dr'&&(/swiggy/i.test(t.merchant)||/zomato/i.test(t.merchant));});
+    // All food delivery combined: Swiggy + Zomato + Blinkit
+    var foodRe=/swiggy|zomato|blinkit|grofers/i;
+    var allFood=transactions.filter(function(t){return t.type==='dr'&&foodRe.test(t.merchant);});
     var grandTotal=allFood.reduce(function(s,t){return s+t.amount;},0);
-    var grandCount=allFood.length;
     el.innerHTML=
       '<div style="margin:0 20px 16px;background:var(--surface);border:0.5px solid var(--border);border-radius:16px;padding:16px;display:flex;justify-content:space-between;align-items:center;">'+
         '<div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;">All-time Total</div>'+
         '<div>'+
           '<div style="font-size:22px;font-weight:800;font-family:var(--mono);color:var(--red);text-align:right;">'+fmt(grandTotal)+'</div>'+
-          '<div style="font-size:11px;color:var(--muted);text-align:right;">'+grandCount+' orders</div>'+
+          '<div style="font-size:11px;color:var(--muted);text-align:right;">'+allFood.length+' orders</div>'+
         '</div>'+
       '</div>'+
       keys.map(function(key){
         var m=months[key];
-        var orders=m.txns.filter(function(t){return t.type==='dr'&&(/swiggy/i.test(t.merchant)||/zomato/i.test(t.merchant));});
+        var orders=m.txns.filter(function(t){return t.type==='dr'&&foodRe.test(t.merchant);});
         if (!orders.length) return '';
         var total=orders.reduce(function(s,t){return s+t.amount;},0);
-        var swiggyTotal=orders.filter(function(t){return /swiggy/i.test(t.merchant);}).reduce(function(s,t){return s+t.amount;},0);
-        var zomatoTotal=orders.filter(function(t){return /zomato/i.test(t.merchant);}).reduce(function(s,t){return s+t.amount;},0);
+        var swiggyT=orders.filter(function(t){return /swiggy/i.test(t.merchant);}).reduce(function(s,t){return s+t.amount;},0);
+        var zomatoT=orders.filter(function(t){return /zomato/i.test(t.merchant);}).reduce(function(s,t){return s+t.amount;},0);
+        var blinkitT=orders.filter(function(t){return /blinkit|grofers/i.test(t.merchant);}).reduce(function(s,t){return s+t.amount;},0);
+        function row(icon,label,amt,color){
+          return amt>0?'<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:0.5px solid var(--border);">'+
+            '<div style="display:flex;align-items:center;gap:8px;"><span>'+icon+'</span><span style="font-size:13px;">'+label+'</span></div>'+
+            '<span style="font-family:var(--mono);font-weight:700;color:'+color+';">'+fmt(amt)+'</span>'+
+          '</div>':'';
+        }
         return '<div class="month-card">'+
           '<div class="month-card-header">'+
             '<div><div class="month-card-title">'+m.label+'</div>'+
@@ -818,55 +840,49 @@ function renderMonthly() {
             '<div class="month-card-total">'+fmt(total)+'</div>'+
           '</div>'+
           '<div>'+
-            (swiggyTotal>0?'<div style="display:flex;justify-content:space-between;align-items:center;padding:11px 16px;border-bottom:0.5px solid var(--border);">'+
-              '<div style="display:flex;align-items:center;gap:8px;"><span>🍊</span><span style="font-size:13px;">Swiggy</span></div>'+
-              '<span style="font-family:var(--mono);font-weight:700;color:var(--orange);">'+fmt(swiggyTotal)+'</span>'+
-            '</div>':'')+
-            (zomatoTotal>0?'<div style="display:flex;justify-content:space-between;align-items:center;padding:11px 16px;">'+
-              '<div style="display:flex;align-items:center;gap:8px;"><span>🍅</span><span style="font-size:13px;">Zomato</span></div>'+
-              '<span style="font-family:var(--mono);font-weight:700;color:var(--red);">'+fmt(zomatoTotal)+'</span>'+
-            '</div>':'')+
+            row('🍊','Swiggy',swiggyT,'var(--orange)')+
+            row('🍅','Zomato',zomatoT,'var(--red)')+
+            row('🛒','Blinkit',blinkitT,'var(--amber)')+
           '</div>'+
         '</div>';
       }).join('');
     return;
   }
 
-  if (monthlyTab==='blinkit') {
-    // Blinkit month by month
-    var allBlinkit=transactions.filter(function(t){return t.type==='dr'&&/blinkit|grofers/i.test(t.merchant);});
-    var bGrandTotal=allBlinkit.reduce(function(s,t){return s+t.amount;},0);
-    var bGrandCount=allBlinkit.length;
+  if (monthlyTab==='cigs') {
+    var allCigs=transactions.filter(function(t){return t.category==='cigs'&&t.type==='dr';});
+    var cigTotal=allCigs.reduce(function(s,t){return s+t.amount;},0);
     el.innerHTML=
       '<div style="margin:0 20px 16px;background:var(--surface);border:0.5px solid var(--border);border-radius:16px;padding:16px;display:flex;justify-content:space-between;align-items:center;">'+
         '<div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;">All-time Total</div>'+
         '<div>'+
-          '<div style="font-size:22px;font-weight:800;font-family:var(--mono);color:var(--amber);text-align:right;">'+fmt(bGrandTotal)+'</div>'+
-          '<div style="font-size:11px;color:var(--muted);text-align:right;">'+bGrandCount+' orders</div>'+
+          '<div style="font-size:22px;font-weight:800;font-family:var(--mono);color:#94a3b8;text-align:right;">'+fmt(cigTotal)+'</div>'+
+          '<div style="font-size:11px;color:var(--muted);text-align:right;">'+allCigs.length+' entries</div>'+
         '</div>'+
       '</div>'+
+      (allCigs.length===0?'<div class="empty-state">No cig expenses logged yet.</div>':
       keys.map(function(key){
         var m=months[key];
-        var orders=m.txns.filter(function(t){return t.type==='dr'&&/blinkit|grofers/i.test(t.merchant);});
-        if (!orders.length) return '';
-        var total=orders.reduce(function(s,t){return s+t.amount;},0);
+        var cigs=m.txns.filter(function(t){return t.category==='cigs'&&t.type==='dr';});
+        if (!cigs.length) return '';
+        var total=cigs.reduce(function(s,t){return s+t.amount;},0);
         return '<div class="month-card">'+
           '<div class="month-card-header">'+
             '<div><div class="month-card-title">'+m.label+'</div>'+
-            '<div style="font-size:10px;color:var(--muted);margin-top:2px;">'+orders.length+' orders</div></div>'+
-            '<div class="month-card-total" style="color:var(--amber);">'+fmt(total)+'</div>'+
+            '<div style="font-size:10px;color:var(--muted);margin-top:2px;">'+cigs.length+' entries</div></div>'+
+            '<div class="month-card-total" style="color:#94a3b8;">'+fmt(total)+'</div>'+
           '</div>'+
           '<div>'+
-            orders.map(function(t){
+            cigs.map(function(t){
               return '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-top:0.5px solid var(--border);">'+
                 '<div><div style="font-size:12px;font-weight:600;">'+t.merchant+'</div>'+
                 '<div style="font-size:10px;color:var(--muted);">'+t.date+'</div></div>'+
-                '<span style="font-family:var(--mono);font-weight:700;color:var(--amber);">'+fmt(t.amount)+'</span>'+
+                '<span style="font-family:var(--mono);font-weight:700;color:#94a3b8;">'+fmt(t.amount)+'</span>'+
               '</div>';
             }).join('')+
           '</div>'+
         '</div>';
-      }).join('');
+      }).join(''));
     return;
   }
 
@@ -878,6 +894,7 @@ function renderMonthly() {
     {key:'utilities', label:'Utilities',       color:'var(--blue)'},
     {key:'sip',       label:'SIP',             color:'var(--accent2)'},
     {key:'stocks',    label:'Stocks',          color:'var(--green)'},
+    {key:'cigs',      label:'Cigarettes',      color:'#94a3b8'},
     {key:'cc_icici',  label:'ICICI Card',      color:'var(--orange)'},
     {key:'cc_axis',   label:'Axis Card',       color:'var(--red)'},
     {key:'cc_axis_neo',label:'Axis Neo Card',  color:'var(--pink)'},
@@ -958,7 +975,7 @@ function render() {
 
   // Savings
   var SAVINGS_GOAL=10000;
-  var BANK_CATS=['gpay','rent','utilities','sip','stocks','expense','cred_icici','cred_axis','cred_axis_neo','cred_kotak','cred_amazon'];
+  var BANK_CATS=['gpay','rent','utilities','sip','stocks','cigs','expense','cred_icici','cred_axis','cred_axis_neo','cred_kotak','cred_amazon'];
   var monthIncome=transactions.filter(function(t){return isIncome(t.category)&&t.type==='cr';}).reduce(function(s,t){return s+t.amount;},0);
   var bankDebits=transactions.filter(function(t){return t.type==='dr'&&BANK_CATS.indexOf(t.category)>=0;}).reduce(function(s,t){return s+t.amount;},0);
   var saved=monthIncome-bankDebits;
@@ -1033,7 +1050,7 @@ function render() {
   }).join('');
 
   // Breakdown
-  var catColors2={expense:'var(--accent)',gpay:'var(--teal)',rent:'var(--red)',utilities:'var(--blue)',sip:'var(--accent2)',stocks:'var(--green)',salary:'var(--green)',freelance:'var(--green)',cc_icici:'var(--orange)',cc_axis:'var(--red)',cc_axis_neo:'var(--pink)',cc_kotak:'var(--amber)',cc_amazon:'var(--blue)',cred_icici:'var(--amber)',cred_axis:'var(--amber)',cred_axis_neo:'var(--amber)',cred_kotak:'var(--amber)',cred_amazon:'var(--amber)'};
+  var catColors2={expense:'var(--accent)',gpay:'var(--teal)',rent:'var(--red)',utilities:'var(--blue)',sip:'var(--accent2)',stocks:'var(--green)',cigs:'#94a3b8',salary:'var(--green)',freelance:'var(--green)',cc_icici:'var(--orange)',cc_axis:'var(--red)',cc_axis_neo:'var(--pink)',cc_kotak:'var(--amber)',cc_amazon:'var(--blue)',cred_icici:'var(--amber)',cred_axis:'var(--amber)',cred_axis_neo:'var(--amber)',cred_kotak:'var(--amber)',cred_amazon:'var(--amber)'};
   var brows=Object.keys(CAT_LABEL).map(function(c){
     var tot=transactions.filter(function(t){return t.category===c;}).reduce(function(s,t){return s+t.amount;},0);
     if (!tot) return '';
