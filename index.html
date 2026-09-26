@@ -321,7 +321,6 @@
                 <option value="utilities">Utilities</option>
                 <option value="sip">SIP Debit</option>
                 <option value="stocks">Stocks</option>
-                <option value="cigs">Cigarettes</option>
                 <option value="gpay">GPay UPI</option>
               </optgroup>
               <optgroup label="Credit Card Spends">
@@ -355,6 +354,12 @@
           <div class="form-group">
             <label>Date</label>
             <input type="date" id="m-date" />
+          </div>
+        </div>
+        <div class="form-row" id="cigsRow">
+          <div class="form-group form-full">
+            <label>🚬 Cigs in this order (₹) — optional</label>
+            <input type="number" inputmode="decimal" id="m-cigs" placeholder="e.g. 200 — won't affect balance" />
           </div>
         </div>
         <button class="add-manual-btn" onclick="addManual()">Add Transaction</button>
@@ -427,7 +432,6 @@
       <div class="filter-chip" onclick="setFilter('utilities',this)">Utilities</div>
       <div class="filter-chip" onclick="setFilter('sip',this)">SIP</div>
       <div class="filter-chip" onclick="setFilter('stocks',this)">Stocks</div>
-      <div class="filter-chip" onclick="setFilter('cigs',this)">Cigs</div>
       <div class="filter-chip" onclick="setFilter('income',this)">Income</div>
     </div>
     <div style="height:14px;"></div>
@@ -554,12 +558,16 @@ function addManual() {
   var merchant=document.getElementById('m-merchant').value.trim()||'Transaction';
   var category=document.getElementById('m-category').value;
   var date    =document.getElementById('m-date').value||today.toISOString().split('T')[0];
+  var cigsAmt =parseFloat(document.getElementById('m-cigs').value)||0;
   if (!amount||amount<=0){alert('Enter a valid amount.');return;}
   var type=isIncome(category)?'cr':manualType;
-  addTransaction({amount:amount,merchant:merchant,type:type,category:category,date:date});
+  var txn={amount:amount,merchant:merchant,type:type,category:category,date:date};
+  if (cigsAmt>0) txn.cigs=cigsAmt;
+  addTransaction(txn);
   document.getElementById('m-amount').value='';
   document.getElementById('m-merchant').value='';
-  showToast('Transaction added!');
+  document.getElementById('m-cigs').value='';
+  showToast('Transaction added!'+(cigsAmt>0?' ('+fmt(cigsAmt)+' cigs logged)':''));
   switchNav('home',document.querySelectorAll('.nav-item')[0]);
 }
 function addTransaction(txn) {
@@ -780,14 +788,10 @@ function switchMonthlyTab(tab) {
   renderMonthly();
 }
 
-// quickAddCig — opens Add tab with Cigs pre-selected
+// quickAddCig — just scrolls to Add and focuses the cigs field
 function quickAddCig() {
-  document.getElementById('m-category').value='cigs';
-  manualType='dr';
-  document.getElementById('btn-dr').classList.add('active');
-  document.getElementById('btn-cr').classList.remove('active');
-  document.getElementById('m-merchant').value='Cigarettes';
   switchNav('add', document.querySelectorAll('.nav-item')[1]);
+  setTimeout(function(){ document.getElementById('m-cigs').focus(); }, 300);
 }
 
 // Monthly report
@@ -850,8 +854,8 @@ function renderMonthly() {
   }
 
   if (monthlyTab==='cigs') {
-    var allCigs=transactions.filter(function(t){return t.category==='cigs'&&t.type==='dr';});
-    var cigTotal=allCigs.reduce(function(s,t){return s+t.amount;},0);
+    var allCigs=transactions.filter(function(t){return t.cigs&&t.cigs>0;});
+    var cigTotal=allCigs.reduce(function(s,t){return s+t.cigs;},0);
     el.innerHTML=
       '<div style="margin:0 20px 16px;background:var(--surface);border:0.5px solid var(--border);border-radius:16px;padding:16px;display:flex;justify-content:space-between;align-items:center;">'+
         '<div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;">All-time Total</div>'+
@@ -860,12 +864,12 @@ function renderMonthly() {
           '<div style="font-size:11px;color:var(--muted);text-align:right;">'+allCigs.length+' entries</div>'+
         '</div>'+
       '</div>'+
-      (allCigs.length===0?'<div class="empty-state">No cig expenses logged yet.</div>':
+      (allCigs.length===0?'<div class="empty-state">No cig expenses logged yet.<br>Add them via the 🚬 field when adding a transaction.</div>':
       keys.map(function(key){
         var m=months[key];
-        var cigs=m.txns.filter(function(t){return t.category==='cigs'&&t.type==='dr';});
+        var cigs=m.txns.filter(function(t){return t.cigs&&t.cigs>0;});
         if (!cigs.length) return '';
-        var total=cigs.reduce(function(s,t){return s+t.amount;},0);
+        var total=cigs.reduce(function(s,t){return s+t.cigs;},0);
         return '<div class="month-card">'+
           '<div class="month-card-header">'+
             '<div><div class="month-card-title">'+m.label+'</div>'+
@@ -875,9 +879,11 @@ function renderMonthly() {
           '<div>'+
             cigs.map(function(t){
               return '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-top:0.5px solid var(--border);">'+
-                '<div><div style="font-size:12px;font-weight:600;">'+t.merchant+'</div>'+
-                '<div style="font-size:10px;color:var(--muted);">'+t.date+'</div></div>'+
-                '<span style="font-family:var(--mono);font-weight:700;color:#94a3b8;">'+fmt(t.amount)+'</span>'+
+                '<div>'+
+                  '<div style="font-size:12px;font-weight:600;">'+t.merchant+'</div>'+
+                  '<div style="font-size:10px;color:var(--muted);">'+t.date+' · via '+( CAT_LABEL[t.category]||t.category)+'</div>'+
+                '</div>'+
+                '<span style="font-family:var(--mono);font-weight:700;color:#94a3b8;">'+fmt(t.cigs)+'</span>'+
               '</div>';
             }).join('')+
           '</div>'+
@@ -894,7 +900,6 @@ function renderMonthly() {
     {key:'utilities', label:'Utilities',       color:'var(--blue)'},
     {key:'sip',       label:'SIP',             color:'var(--accent2)'},
     {key:'stocks',    label:'Stocks',          color:'var(--green)'},
-    {key:'cigs',      label:'Cigarettes',      color:'#94a3b8'},
     {key:'cc_icici',  label:'ICICI Card',      color:'var(--orange)'},
     {key:'cc_axis',   label:'Axis Card',       color:'var(--red)'},
     {key:'cc_axis_neo',label:'Axis Neo Card',  color:'var(--pink)'},
@@ -975,7 +980,7 @@ function render() {
 
   // Savings
   var SAVINGS_GOAL=10000;
-  var BANK_CATS=['gpay','rent','utilities','sip','stocks','cigs','expense','cred_icici','cred_axis','cred_axis_neo','cred_kotak','cred_amazon'];
+  var BANK_CATS=['gpay','rent','utilities','sip','stocks','expense','cred_icici','cred_axis','cred_axis_neo','cred_kotak','cred_amazon'];
   var monthIncome=transactions.filter(function(t){return isIncome(t.category)&&t.type==='cr';}).reduce(function(s,t){return s+t.amount;},0);
   var bankDebits=transactions.filter(function(t){return t.type==='dr'&&BANK_CATS.indexOf(t.category)>=0;}).reduce(function(s,t){return s+t.amount;},0);
   var saved=monthIncome-bankDebits;
